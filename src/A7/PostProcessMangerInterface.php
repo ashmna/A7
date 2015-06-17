@@ -4,6 +4,10 @@
 namespace A7;
 
 
-interface PostProcessorMangerInterface {
-    public function getPostProcessorInstance($PostProcessorName);
+interface PostProcessManagerInterface {
+    /**
+     * @param $postProcessName
+     * @return PostProcessInterface
+     */
+    public function getPostProcessInstance($postProcessName);
 }

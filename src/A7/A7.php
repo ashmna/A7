@@ -6,12 +6,15 @@ namespace A7;
 
 class A7 implements A7Interface {
 
+    /** @var PostProcessInterface[] */
     protected $postProcessors = [];
+    /** @var array */
     protected $singletonList  = [];
+    /** @var PostProcessManagerInterface */
     protected $postProcessManager;
 
     public function __construct() {
-        $this->postProcessManager = new PostProcessorManger();
+        $this->postProcessManager = new PostProcessManager();
     }
 
     public function get($class)
@@ -38,7 +41,7 @@ class A7 implements A7Interface {
 
     public function enablePostProcessor($postProcessor)
     {
-        $this->postProcessors[$postProcessor] = $this->postProcessManager->getPostProcessorInstance($postProcessor);
+        $this->postProcessors[$postProcessor] = $this->postProcessManager->getPostProcessInstance($postProcessor);
     }
 
     public function disablePostProcessor($postProcessor)
@@ -49,7 +52,14 @@ class A7 implements A7Interface {
     }
 
     protected function initClass($class) {
-
+        $instance = new \stdClass();
+        foreach($this->postProcessors as $postProcessor) {
+            $instance = $postProcessor->postProcessAfterInitialization($instance, $class);
+        }
+        foreach($this->postProcessors as $postProcessor) {
+            $instance = $postProcessor->postProcessBeforeInitialization($instance, $class);
+        }
+        return $instance;
     }
 
 }
