@@ -4,7 +4,8 @@
   "minimum-stability": "dev",
   "autoload" : {
     "psr-4": {
-      "Lotto\\" : "src/Lotto"
+      "Lotto\\" : "src/Lotto",
+      "A7\\" : "src/A7"
     }
   },
   "authors": [
