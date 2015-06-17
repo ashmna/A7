@@ -4,7 +4,8 @@
 namespace A7;
 
 
-class A7 implements A7Interface {
+class A7 implements A7Interface
+{
 
     /** @var PostProcessInterface[] */
     protected $postProcessors = [];

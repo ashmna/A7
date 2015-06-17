@@ -4,7 +4,8 @@
 namespace A7;
 
 
-class PostProcessManager implements PostProcessManagerInterface {
+class PostProcessManager implements PostProcessManagerInterface
+{
 
     /**
      * @inheritdoc
