@@ -1,0 +1,19 @@
+{
+  "name": "ashmna/lotto",
+  "description": "Random lotto platform for all",
+  "minimum-stability": "dev",
+  "autoload" : {
+    "psr-4": {
+      "Lotto\\" : "src/Lotto"
+    }
+  },
+  "authors": [
+    {
+      "name": "Mnatsakanyan Ashot",
+      "email": "mnatsakanyan.ashot@gmail.com"
+    }
+  ],
+  "require": {
+    "doctrine/annotations": "1.3.x-dev"
+  }
+}
