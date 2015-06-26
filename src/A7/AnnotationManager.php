@@ -5,6 +5,8 @@ namespace A7;
 
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\AnnotationRegistry;
+use Doctrine\Common\Annotations\SimpleAnnotationReader;
 
 class AnnotationManager implements AnnotationManagerInterface
 {
@@ -14,7 +16,9 @@ class AnnotationManager implements AnnotationManagerInterface
     public function __construct()
     {
         $this->cache = [];
-        $this->annotationReader = new AnnotationReader();
+        AnnotationRegistry::registerAutoloadNamespace('A7\Annotations', __DIR__.'/../');
+        $this->annotationReader = new SimpleAnnotationReader();
+        $this->annotationReader->addNamespace('A7\Annotations');
     }
 
     public function getClassAnnotations($className)

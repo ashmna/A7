@@ -4,6 +4,8 @@
 namespace A7;
 
 
+use A7\Annotations\Injectable;
+
 class A7 implements A7Interface
 {
 
@@ -13,9 +15,13 @@ class A7 implements A7Interface
     protected $singletonList  = [];
     /** @var PostProcessManagerInterface */
     protected $postProcessManager;
+    /** @var AnnotationManagerInterface */
+    protected $annotationManager;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->postProcessManager = new PostProcessManager();
+        $this->annotationManager  = new AnnotationManager();
     }
 
     public function get($class)
@@ -28,7 +34,9 @@ class A7 implements A7Interface
 
         if(class_exists($class)) {
             $object = $this->initClass($class);
-            $this->singletonList[$class] = $object;
+            if($this->isSingleton($class)) {
+                $this->singletonList[$class] = $object;
+            }
             return $object;
         } else {
             throw new \Exception($class.' class not found');
@@ -52,15 +60,25 @@ class A7 implements A7Interface
         }
     }
 
-    protected function initClass($class) {
-        $instance = new \stdClass();
-        foreach($this->postProcessors as $postProcessor) {
-            $instance = $postProcessor->postProcessAfterInitialization($instance, $class);
-        }
+    protected function initClass($class)
+    {
+        $instance = new $class();
         foreach($this->postProcessors as $postProcessor) {
             $instance = $postProcessor->postProcessBeforeInitialization($instance, $class);
         }
+        foreach($this->postProcessors as $postProcessor) {
+            $instance = $postProcessor->postProcessAfterInitialization($instance, $class);
+        }
         return $instance;
+    }
+
+    protected function isSingleton($class)
+    {
+        $injectable = $this->annotationManager->getClassAnnotation($class, 'Injectable');
+        /** @var Injectable $injectable */
+        $injectable = !isset($injectable) ? new Injectable() : $injectable;
+
+        return $injectable->isSingleton();
     }
 
 }

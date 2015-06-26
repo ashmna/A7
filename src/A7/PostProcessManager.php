@@ -12,6 +12,7 @@ class PostProcessManager implements PostProcessManagerInterface
      */
     public function getPostProcessInstance($postProcessName)
     {
-        // TODO: Implement getPostProcessorInstance() method.
+        $c = 'A7\PostProcessors\\'.$postProcessName;
+        return new $c();
     }
 }
