@@ -49,10 +49,11 @@ class AnnotationManager implements AnnotationManagerInterface
                 if(!empty($propertyAnnotations)) {
                     $newPropertyAnnotations = [];
                     foreach($propertyAnnotations as $annotation) {
-                        $newPropertyAnnotations[get_class($annotation)] = $annotation;
+                        $newPropertyAnnotations[basename(get_class($annotation))] = $annotation;
                     }
                     $propertyAnnotations = $newPropertyAnnotations;
                 }
+                self::getVar($reflectionProperty->getDocComment(), $propertyAnnotations);
                 $propertiesAnnotations[$reflectionProperty->getName()] = $propertyAnnotations;
             }
             $this->setCache($key, $propertiesAnnotations);
@@ -123,6 +124,12 @@ class AnnotationManager implements AnnotationManagerInterface
     private function getCache($key)
     {
         return isset($this->cache[$key]) ? $this->cache[$key] : null;
+    }
+
+    private static function getVar($docComment, &$propertyAnnotations) {
+        if(!empty($docComment) && preg_match("/@var\s+([\w\\\\]+)/", $docComment, $output) !== false) {
+            if(isset($output[1])) $propertyAnnotations['var'] = $output[1];
+        }
     }
 
 }

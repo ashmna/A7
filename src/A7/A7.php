@@ -20,8 +20,8 @@ class A7 implements A7Interface
 
     public function __construct()
     {
-        $this->postProcessManager = new PostProcessManager();
         $this->annotationManager  = new AnnotationManager();
+        $this->postProcessManager = new PostProcessManager($this, $this->annotationManager);
     }
 
     public function get($class)
@@ -48,9 +48,9 @@ class A7 implements A7Interface
         // TODO: Implement call() method.
     }
 
-    public function enablePostProcessor($postProcessor)
+    public function enablePostProcessor($postProcessor, array $parameters = [])
     {
-        $this->postProcessors[$postProcessor] = $this->postProcessManager->getPostProcessInstance($postProcessor);
+        $this->postProcessors[$postProcessor] = $this->postProcessManager->getPostProcessInstance($postProcessor, $parameters);
     }
 
     public function disablePostProcessor($postProcessor)

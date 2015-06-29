@@ -4,29 +4,39 @@
 namespace A7\PostProcessors;
 
 
-use A7\AnnotationManager;
 use A7\PostProcessInterface;
 
 class DependencyInjection implements PostProcessInterface
 {
+    /** @var \A7\A7Interface  */
+    protected $a7;
+    /** @var \A7\AnnotationManagerInterface  */
+    protected $annotationManager;
+    /** @var array */
+    protected $parameters;
 
     function postProcessBeforeInitialization($instance, $className) {
-        $annotationManager = new AnnotationManager();
-        $propertiesAnnotations = $annotationManager->getPropertiesAnnotations($className);
+        $propertiesAnnotations = $this->annotationManager->getPropertiesAnnotations($className);
         foreach($propertiesAnnotations as $propertyName => $annotations) {
-            var_dump($annotations);
-            if(isset($annotations['A7\Annotations\Inject'])) {
-                echo $propertyName."\n";
+            if(isset($annotations['Inject'])) {
+                /** @var \A7\Annotations\Inject $inject */
+                $inject = $annotations['Inject'];
                 $reflectionProperty = new \ReflectionProperty($instance, $propertyName);
                 $reflectionProperty->setAccessible(true);
-                $reflectionProperty->setValue($instance, 'gugo');
+                if($inject->isInjectObject()) {
+                    $reflectionProperty->setValue($instance, $this->a7->get($inject->getName()));
+                } else {
+                    $name = $inject->getName();
+                    if(isset($parameters[$name])) {
+                        $reflectionProperty->setValue($instance, $parameters[$name]);
+                    }
+                }
             }
         }
         return $instance;
     }
 
     function postProcessAfterInitialization($instance, $className) {
-        // TODO: Implement postProcessAfterInitialization() method.
         return $instance;
     }
 
