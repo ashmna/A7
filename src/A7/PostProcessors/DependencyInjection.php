@@ -15,10 +15,11 @@ class DependencyInjection implements PostProcessInterface
         $propertiesAnnotations = $annotationManager->getPropertiesAnnotations($className);
         foreach($propertiesAnnotations as $propertyName => $annotations) {
             var_dump($annotations);
-            if(isset($annotations['Inject'])) {
+            if(isset($annotations['A7\Annotations\Inject'])) {
+                echo $propertyName."\n";
                 $reflectionProperty = new \ReflectionProperty($instance, $propertyName);
                 $reflectionProperty->setAccessible(true);
-                $reflectionProperty->setValue('gugo');
+                $reflectionProperty->setValue($instance, 'gugo');
             }
         }
         return $instance;

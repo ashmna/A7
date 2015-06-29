@@ -45,7 +45,15 @@ class AnnotationManager implements AnnotationManagerInterface
             $reflectionProperties = $reflectionClass->getProperties();
             $propertiesAnnotations = [];
             foreach ($reflectionProperties as $reflectionProperty) {
-                $propertiesAnnotations[$reflectionProperty->getName()] = $this->annotationReader->getPropertyAnnotations($reflectionProperty);
+                $propertyAnnotations = $this->annotationReader->getPropertyAnnotations($reflectionProperty);
+                if(!empty($propertyAnnotations)) {
+                    $newPropertyAnnotations = [];
+                    foreach($propertyAnnotations as $annotation) {
+                        $newPropertyAnnotations[get_class($annotation)] = $annotation;
+                    }
+                    $propertyAnnotations = $newPropertyAnnotations;
+                }
+                $propertiesAnnotations[$reflectionProperty->getName()] = $propertyAnnotations;
             }
             $this->setCache($key, $propertiesAnnotations);
         }

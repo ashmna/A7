@@ -11,8 +11,10 @@ $a7 = new \A7\A7();
 $a7->enablePostProcessor('DependencyInjection');
 
 
-$a7->get('AffiliatesImpl');
+$s = $a7->get('AffiliatesImpl');
 
+
+var_dump($s);
 
 
 
