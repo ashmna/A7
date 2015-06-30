@@ -9,4 +9,5 @@ interface A7Interface
     public function call($class, $method, array $arguments);
     public function enablePostProcessor($postProcessor);
     public function disablePostProcessor($postProcessor);
+    public function initClass($class, $checkLazy = true);
 }

@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Class AffiliatesImpl
+ * @Injectable(lazy=false)
+ * @Cache(enable=true)
+ */
 class AffiliatesImpl {
     /**
      * @Inject
@@ -31,6 +36,11 @@ class AffiliatesImpl {
      * @var \AFF\DAO\CommissionPlans
      */
     protected $commission;
+
+    public function kuku($arg1) {
+        return microtime(false).$arg1." === arg1 \n";
+    }
+
     public function createAffiliate(Affiliate $affiliate, Token $token) {
         $this->db->beginTransaction();
         try {

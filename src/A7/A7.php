@@ -60,14 +60,21 @@ class A7 implements A7Interface
         }
     }
 
-    protected function initClass($class)
+    public function initClass($class, $checkLazy = true)
     {
-        $instance = new $class();
+        if($checkLazy && $this->isLazy($class)) {
+            $instance = new Proxy($this, $class);
+        } else {
+            $instance = new $class();
+        }
         foreach($this->postProcessors as $postProcessor) {
             $instance = $postProcessor->postProcessBeforeInitialization($instance, $class);
         }
         foreach($this->postProcessors as $postProcessor) {
             $instance = $postProcessor->postProcessAfterInitialization($instance, $class);
+        }
+        if(!$checkLazy && $this->isSingleton($class)) {
+            $this->singletonList[$class] = $instance;
         }
         return $instance;
     }
@@ -79,6 +86,14 @@ class A7 implements A7Interface
         $injectable = !isset($injectable) ? new Injectable() : $injectable;
 
         return $injectable->isSingleton();
+    }
+
+    protected function isLazy($class)
+    {
+        $injectable = $this->annotationManager->getClassAnnotation($class, 'Injectable');
+        /** @var Injectable $injectable */
+        $injectable = !isset($injectable) ? new Injectable() : $injectable;
+        return $injectable->lazy;
     }
 
 }

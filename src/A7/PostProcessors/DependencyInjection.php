@@ -5,6 +5,7 @@ namespace A7\PostProcessors;
 
 
 use A7\PostProcessInterface;
+use A7\Proxy;
 
 class DependencyInjection implements PostProcessInterface
 {
@@ -16,7 +17,10 @@ class DependencyInjection implements PostProcessInterface
     protected $parameters;
 
     function postProcessBeforeInitialization($instance, $className) {
+        if($instance instanceof Proxy) return $instance;
+
         $propertiesAnnotations = $this->annotationManager->getPropertiesAnnotations($className);
+
         foreach($propertiesAnnotations as $propertyName => $annotations) {
             if(isset($annotations['Inject'])) {
                 /** @var \A7\Annotations\Inject $inject */
@@ -33,6 +37,7 @@ class DependencyInjection implements PostProcessInterface
                 }
             }
         }
+
         return $instance;
     }
 

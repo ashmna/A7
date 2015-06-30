@@ -26,7 +26,7 @@ class AnnotationManager implements AnnotationManagerInterface
         $key = 'A7-CA-'.$className;
         if(!$this->inCache($key)) {
             $reflectionClass = $this->getReflectionClass($className);
-            $this->setCache($key, $this->annotationReader->getClassAnnotations($reflectionClass));
+            $this->setCache($key, self::toAssoc($this->annotationReader->getClassAnnotations($reflectionClass)));
         }
         return $this->getCache($key);
     }
@@ -45,14 +45,7 @@ class AnnotationManager implements AnnotationManagerInterface
             $reflectionProperties = $reflectionClass->getProperties();
             $propertiesAnnotations = [];
             foreach ($reflectionProperties as $reflectionProperty) {
-                $propertyAnnotations = $this->annotationReader->getPropertyAnnotations($reflectionProperty);
-                if(!empty($propertyAnnotations)) {
-                    $newPropertyAnnotations = [];
-                    foreach($propertyAnnotations as $annotation) {
-                        $newPropertyAnnotations[basename(get_class($annotation))] = $annotation;
-                    }
-                    $propertyAnnotations = $newPropertyAnnotations;
-                }
+                $propertyAnnotations = self::toAssoc($this->annotationReader->getPropertyAnnotations($reflectionProperty));
                 self::getVar($reflectionProperty->getDocComment(), $propertyAnnotations);
                 $propertiesAnnotations[$reflectionProperty->getName()] = $propertyAnnotations;
             }
@@ -124,6 +117,16 @@ class AnnotationManager implements AnnotationManagerInterface
     private function getCache($key)
     {
         return isset($this->cache[$key]) ? $this->cache[$key] : null;
+    }
+
+    private static function toAssoc($annotations) {
+        $newAnnotations = [];
+        if(!empty($annotations)) {
+            foreach($annotations as $annotation) {
+                $newAnnotations[basename(get_class($annotation))] = $annotation;
+            }
+        }
+        return $newAnnotations;
     }
 
     private static function getVar($docComment, &$propertyAnnotations) {
