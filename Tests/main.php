@@ -8,29 +8,32 @@ if(!class_exists('Memcached')) {
 require_once  'AffiliatesImpl.php';
 
 $a7 = new \A7\A7();
-$a7->enablePostProcessor('DependencyInjection');
+$a7->enablePostProcessor('DependencyInjection', [
+    'partner.id' => 5,
+]);
+
 //$a7->enablePostProcessor('Logger');
 $a7->enablePostProcessor('Cache');
 
-echo '<pre>';
 /** @var AffiliatesImpl $s */
 $s = $a7->get('AffiliatesImpl');
 
 
+
+echo $s->kuku('call 1');
 echo $s->kuku('call 1');
 echo $s->kuku('call 2');
+echo $s->kuku('call 2');
 echo $s->kuku('call 1');
-echo $s->kuku('call 4');
+echo $s->kuku('call 1');
 echo $s->kuku('call 1');
 
+var_dump($s);
 
 
 
 
 
-
-
-echo '</pre>';
 
 
 

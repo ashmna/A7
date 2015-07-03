@@ -2,7 +2,7 @@
 
 /**
  * Class AffiliatesImpl
- * @Injectable(lazy=false)
+ * @Injectable(lazy=true)
  * @Cache(enable=true)
  */
 class AffiliatesImpl {

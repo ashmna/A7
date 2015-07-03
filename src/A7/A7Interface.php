@@ -5,9 +5,10 @@ namespace A7;
 
 interface A7Interface
 {
-    public function get($class);
-    public function call($class, $method, array $arguments);
-    public function enablePostProcessor($postProcessor);
-    public function disablePostProcessor($postProcessor);
-    public function initClass($class, $checkLazy = true);
+    function get($class);
+    function call($class, $method, array $arguments);
+    function enablePostProcessor($postProcessor);
+    function disablePostProcessor($postProcessor);
+    function initClass($class, $checkLazy = true);
+    function doPostProcessors($instance, $class, array $postProcessors);
 }

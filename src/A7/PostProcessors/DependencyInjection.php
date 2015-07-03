@@ -9,7 +9,6 @@ use A7\Proxy;
 
 class DependencyInjection implements PostProcessInterface
 {
-    public $processMode = 0;//all
     /** @var \A7\A7Interface  */
     protected $a7;
     /** @var \A7\AnnotationManagerInterface  */
@@ -17,9 +16,24 @@ class DependencyInjection implements PostProcessInterface
     /** @var array */
     protected $parameters;
 
-    function postProcessBeforeInitialization($instance, $className) {
-        if($instance instanceof Proxy) return $instance;
+    function postProcessBeforeInitialization($instance, $className)
+    {
+        if($instance instanceof Proxy) {
+            $instance->a7AddPostProcessor($this);
+        } else {
+            $instance = $this->doInjection($instance, $className);
+        }
 
+        return $instance;
+    }
+
+    function postProcessAfterInitialization($instance, $className)
+    {
+        return $instance;
+    }
+
+    protected function doInjection($instance, $className)
+    {
         $propertiesAnnotations = $this->annotationManager->getPropertiesAnnotations($className);
 
         foreach($propertiesAnnotations as $propertyName => $annotations) {
@@ -32,17 +46,12 @@ class DependencyInjection implements PostProcessInterface
                     $reflectionProperty->setValue($instance, $this->a7->get($inject->getName()));
                 } else {
                     $name = $inject->getName();
-                    if(isset($parameters[$name])) {
-                        $reflectionProperty->setValue($instance, $parameters[$name]);
+                    if(isset($name) && isset($this->parameters[$name])) {
+                        $reflectionProperty->setValue($instance, $this->parameters[$name]);
                     }
                 }
             }
         }
-
-        return $instance;
-    }
-
-    function postProcessAfterInitialization($instance, $className) {
         return $instance;
     }
 

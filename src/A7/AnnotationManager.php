@@ -74,7 +74,7 @@ class AnnotationManager implements AnnotationManagerInterface
             $reflectionMethods = $reflectionClass->getMethods();
             $methodsAnnotations = [];
             foreach($reflectionMethods as $reflectionMethod) {
-                $methodsAnnotations[$reflectionMethod->getName()] = $this->annotationReader->getMethodAnnotations($reflectionMethod);
+                $methodsAnnotations[$reflectionMethod->getName()] = self::toAssoc($this->annotationReader->getMethodAnnotations($reflectionMethod));
             }
             $this->setCache($key, $methodsAnnotations);
         }

@@ -62,31 +62,44 @@ class A7 implements A7Interface
 
     public function initClass($class, $instanceOnly = false)
     {
-        $instance = $instanceOnly ? new $class() : $this->isLazy($class) ? new Proxy($this, $class) : new $class();
-
-        foreach($this->postProcessors as $postProcessor) {
-            if(self::isCallPostProcessors($postProcessor, $instanceOnly))
-                $instance = $postProcessor->postProcessBeforeInitialization($instance, $class);
+        if ($instanceOnly) {
+            $instance = new $class();
+        } else {
+            $instance = $this->isLazy($class) ? new Proxy($this, $class) : new $class();
         }
 
-        foreach($this->postProcessors as $postProcessor) {
-            if(self::isCallPostProcessors($postProcessor, $instanceOnly))
-                $instance = $postProcessor->postProcessAfterInitialization($instance, $class);
-        }
+        if(!$instanceOnly)
+            $this->doPostProcessors($instance, $class, $this->postProcessors);
+
 
         if($instanceOnly && $this->isSingleton($class)) {
             $this->singletonList[$class] = $instance;
         }
+
         return $instance;
     }
 
-    protected static function isCallPostProcessors(PostProcessInterface $postProcessor, $instanceOnly) {
-        $res = false;
-        if(isset($postProcessor->processMode)) {
-            $res = $postProcessor->processMode == 0;
-            $res = $res ? $res : $instanceOnly ? $postProcessor->processMode == 1 : $postProcessor->processMode == 2;
+    /**
+     * @param $instance
+     * @param $class
+     * @param PostProcessInterface[] $postProcessors
+     */
+    public function doPostProcessors($instance, $class, array $postProcessors)
+    {
+        foreach($postProcessors as $postProcessor) {
+            $instance = $postProcessor->postProcessBeforeInitialization($instance, $class);
         }
-        return $res;
+
+        $methodsAnnotations = $this->annotationManager->getMethodsAnnotations($class);
+        foreach($methodsAnnotations as $method => $annotations) {
+            if(isset($annotations['Init'])) {
+                call_user_func_array([$instance, $method], []);
+            }
+        }
+
+        foreach($postProcessors as $postProcessor) {
+            $instance = $postProcessor->postProcessAfterInitialization($instance, $class);
+        }
     }
 
     protected function isSingleton($class)

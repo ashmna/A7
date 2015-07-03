@@ -8,18 +8,22 @@ class Proxy {
 
     /** @var A7Interface */
     protected $a7;
+    /** @var PostProcessInterface[] */
+    protected $a7PostProcessors = [];
     protected $a7Instance;
     protected $a7ClassName;
     protected $a7BeforeCall = [];
     protected $a7AfterCall  = [];
 
-    public function __construct(A7Interface $a7, $className, $instance = null) {
+    public function __construct(A7Interface $a7, $className, $instance = null)
+    {
         $this->a7 = $a7;
         $this->a7ClassName = $className;
         $this->a7Instance  = $instance;
     }
 
-    public function __call($methodName, array $arguments = []) {
+    public function __call($methodName, array $arguments = [])
+    {
         $this->a7Init();
 
         if(method_exists($this->a7Instance, $methodName)) {
@@ -73,7 +77,8 @@ class Proxy {
         }
     }
 
-    public function __get($name) {
+    public function __get($name)
+    {
         $this->a7Init();
         if(property_exists($this->a7Instance, $name)) {
             return $this->a7Instance->{$name};
@@ -82,7 +87,8 @@ class Proxy {
         }
     }
 
-    public function __set($name, $value) {
+    public function __set($name, $value)
+    {
         $this->a7Init();
         if(property_exists($this->a7Instance, $name)) {
             $this->a7Instance->{$name} = $value;
@@ -91,25 +97,37 @@ class Proxy {
         }
     }
 
-    public function a7AddBeforeCall($beforeCallFunction) {
+    public function a7AddBeforeCall($beforeCallFunction)
+    {
         if(is_callable($beforeCallFunction)) {
             $this->a7BeforeCall[] = $beforeCallFunction;
         }
     }
 
-    public function a7AddAfterCall($afterCallFunction) {
+    public function a7AddAfterCall($afterCallFunction)
+    {
         if(is_callable($afterCallFunction)) {
             $this->a7AfterCall[] = $afterCallFunction;
         }
     }
 
-    public function a7GetInstance()
+    public function a7AddPostProcessor(PostProcessInterface $postProcessor)
     {
-        return $this->a7Instance;
+        $this->a7PostProcessors[] = $postProcessor;
     }
 
-    protected function a7Init() {
-        if(!isset($this->a7Instance)) $this->a7Instance = $this->a7->initClass($this->a7ClassName, false);
+    public function a7DoPostProcessors()
+    {
+        if(isset($this->a7Instance) && !empty($this->a7PostProcessors)) {
+            $this->a7->doPostProcessors($this->a7Instance, $this->a7ClassName, $this->a7PostProcessors);
+            $this->a7PostProcessors = [];
+        }
+    }
+
+    protected function a7Init()
+    {
+        if(!isset($this->a7Instance)) $this->a7Instance = $this->a7->initClass($this->a7ClassName, true);
+        $this->a7DoPostProcessors();
     }
 
 }

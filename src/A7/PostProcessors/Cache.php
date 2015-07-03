@@ -13,22 +13,19 @@ class Cache implements PostProcessInterface
     /** @var  AnnotationManagerInterface */
     protected $annotationManager;
     protected $a7;
-    protected $usedClass;
 
 
     protected $cache = [];
     function postProcessBeforeInitialization($instance, $className)
     {
-        if(isset($this->usedClass[$className])) return $instance;
-
         /** @var \A7\Annotations\Cache $cache */
         $cache = $this->annotationManager->getClassAnnotation($className, 'Cache');
+
         if(isset($cache) && $cache->enable) {
             if(!($instance instanceof Proxy)) {
                 $instance = new Proxy($this->a7, $className, $instance);
             }
 
-            $this->usedClass[$className] = true;
 
             $instance->a7AddBeforeCall(function($arguments, $methodName, $className, &$isCallable, &$result, &$params){
                 $hash = md5(json_encode($arguments));
