@@ -60,23 +60,33 @@ class A7 implements A7Interface
         }
     }
 
-    public function initClass($class, $checkLazy = true)
+    public function initClass($class, $instanceOnly = false)
     {
-        if($checkLazy && $this->isLazy($class)) {
-            $instance = new Proxy($this, $class);
-        } else {
-            $instance = new $class();
-        }
+        $instance = $instanceOnly ? new $class() : $this->isLazy($class) ? new Proxy($this, $class) : new $class();
+
         foreach($this->postProcessors as $postProcessor) {
-            $instance = $postProcessor->postProcessBeforeInitialization($instance, $class);
+            if(self::isCallPostProcessors($postProcessor, $instanceOnly))
+                $instance = $postProcessor->postProcessBeforeInitialization($instance, $class);
         }
+
         foreach($this->postProcessors as $postProcessor) {
-            $instance = $postProcessor->postProcessAfterInitialization($instance, $class);
+            if(self::isCallPostProcessors($postProcessor, $instanceOnly))
+                $instance = $postProcessor->postProcessAfterInitialization($instance, $class);
         }
-        if(!$checkLazy && $this->isSingleton($class)) {
+
+        if($instanceOnly && $this->isSingleton($class)) {
             $this->singletonList[$class] = $instance;
         }
         return $instance;
+    }
+
+    protected static function isCallPostProcessors(PostProcessInterface $postProcessor, $instanceOnly) {
+        $res = false;
+        if(isset($postProcessor->processMode)) {
+            $res = $postProcessor->processMode == 0;
+            $res = $res ? $res : $instanceOnly ? $postProcessor->processMode == 1 : $postProcessor->processMode == 2;
+        }
+        return $res;
     }
 
     protected function isSingleton($class)

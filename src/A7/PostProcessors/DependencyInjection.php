@@ -9,6 +9,7 @@ use A7\Proxy;
 
 class DependencyInjection implements PostProcessInterface
 {
+    public $processMode = 0;//all
     /** @var \A7\A7Interface  */
     protected $a7;
     /** @var \A7\AnnotationManagerInterface  */

@@ -39,6 +39,10 @@ class PostProcessManager implements PostProcessManagerInterface
             $annotationManagerProperty->setValue($postProcessObject, $parameters);
         }
 
+        if(!isset($postProcessObject->processMode)) {
+            $postProcessObject->processMode = 1;
+        }
+
         return $postProcessObject;
     }
 }

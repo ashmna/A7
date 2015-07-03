@@ -103,6 +103,11 @@ class Proxy {
         }
     }
 
+    public function a7GetInstance()
+    {
+        return $this->a7Instance;
+    }
+
     protected function a7Init() {
         if(!isset($this->a7Instance)) $this->a7Instance = $this->a7->initClass($this->a7ClassName, false);
     }
