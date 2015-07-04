@@ -68,9 +68,9 @@ class A7 implements A7Interface
             $instance = $this->isLazy($class) ? new Proxy($this, $class) : new $class();
         }
 
-        if(!$instanceOnly)
+        if(!$instanceOnly) {
             $this->doPostProcessors($instance, $class, $this->postProcessors);
-
+        }
 
         if($instanceOnly && $this->isSingleton($class)) {
             $this->singletonList[$class] = $instance;
@@ -90,7 +90,7 @@ class A7 implements A7Interface
             $instance = $postProcessor->postProcessBeforeInitialization($instance, $class);
         }
 
-        $methodsAnnotations = $this->annotationManager->getMethodsAnnotations($class);
+        $methodsAnnotations = $this->annotationManager->getMethodsAnnotations(get_class($instance));
         foreach($methodsAnnotations as $method => $annotations) {
             if(isset($annotations['Init'])) {
                 call_user_func_array([$instance, $method], []);

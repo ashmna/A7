@@ -38,7 +38,14 @@ class AffiliatesImpl {
     protected $commission;
 
     public function kuku($arg1) {
-        return microtime(false).$arg1." === arg1 \n";
+        return microtime(false).$arg1." === \n";
+    }
+
+    /**
+     * @Init
+     */
+    public function de() {
+        echo $this->kuku('call 2');
     }
 
     public function createAffiliate(Affiliate $affiliate, Token $token) {

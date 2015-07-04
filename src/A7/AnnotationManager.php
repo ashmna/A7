@@ -123,7 +123,7 @@ class AnnotationManager implements AnnotationManagerInterface
         $newAnnotations = [];
         if(!empty($annotations)) {
             foreach($annotations as $annotation) {
-                $newAnnotations[basename(get_class($annotation))] = $annotation;
+                $newAnnotations[basename(str_replace('\\', DIRECTORY_SEPARATOR, get_class($annotation)))] = $annotation;
             }
         }
         return $newAnnotations;

@@ -63,7 +63,7 @@ echo "========= OBJECT ANNOTATIONS =========" . PHP_EOL;
 var_dump($objectAnnotations);
 
 
-//Property Annotations
+    //Property Annotations
 $reflectionProperty = new ReflectionProperty('AnnotationDemo', 'property');
 $propertyAnnotations = $annotationReader->getPropertyAnnotations($reflectionProperty);
 
