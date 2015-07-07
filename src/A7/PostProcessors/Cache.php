@@ -26,25 +26,8 @@ class Cache implements PostProcessInterface
                 $instance = new Proxy($this->a7, $className, $instance);
             }
 
-
-            $instance->a7AddBeforeCall(function($arguments, $methodName, $className, &$isCallable, &$result, &$params){
-                $hash = md5(json_encode($arguments));
-                $key = "$className-$methodName-$hash";
-                if(isset($this->cache[$key])) {
-                    $result = $this->cache[$key];
-                    $isCallable = false;
-                } else {
-                    $params['add_to_cache'] = true;
-                }
-            });
-
-            $instance->a7AddAfterCall(function($arguments, $methodName, $className, &$result, $params){
-                $hash = md5(json_encode($arguments));
-                $key = "$className-$methodName-$hash";
-                if(!empty($params['add_to_cache'])) {
-                    $this->cache[$key] = $result;
-                }
-            });
+            $instance->a7AddBeforeCall([$this, 'beforeCall']);
+            $instance->a7AddAfterCall([$this, 'afterCall']);
 
         }
         return $instance;
@@ -53,6 +36,27 @@ class Cache implements PostProcessInterface
     function postProcessAfterInitialization($instance, $className)
     {
         return $instance;
+    }
+
+    function beforeCall($arguments, $methodName, $className, &$isCallable, &$result, &$params)
+    {
+        $hash = md5(json_encode($arguments));
+        $key = "$className-$methodName-$hash";
+        if(isset($this->cache[$key])) {
+            $result = $this->cache[$key];
+            $isCallable = false;
+        } else {
+            $params['add_to_cache'] = true;
+        }
+    }
+
+    function afterCall($arguments, $methodName, $className, &$result, $params)
+    {
+        $hash = md5(json_encode($arguments));
+        $key = "$className-$methodName-$hash";
+        if(!empty($params['add_to_cache'])) {
+            $this->cache[$key] = $result;
+        }
     }
 
 }
