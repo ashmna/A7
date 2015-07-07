@@ -25,7 +25,7 @@ class AnnotationManager implements AnnotationManagerInterface
     {
         $key = 'A7-CA-'.$className;
         if(!$this->inCache($key)) {
-            $reflectionClass = $this->getReflectionClass($className);
+            $reflectionClass = ReflectionUtils::getInstance()->getClassReflection($className);
             $this->setCache($key, self::toAssoc($this->annotationReader->getClassAnnotations($reflectionClass)));
         }
         return $this->getCache($key);
@@ -41,8 +41,7 @@ class AnnotationManager implements AnnotationManagerInterface
     {
         $key = 'A7-PA-'.$className;
         if(!$this->inCache($key)) {
-            $reflectionClass = $this->getReflectionClass($className);
-            $reflectionProperties = $reflectionClass->getProperties();
+            $reflectionProperties = ReflectionUtils::getInstance()->getPropertiesReflection($className);
             $propertiesAnnotations = [];
             foreach ($reflectionProperties as $reflectionProperty) {
                 $propertyAnnotations = self::toAssoc($this->annotationReader->getPropertyAnnotations($reflectionProperty));
@@ -70,8 +69,7 @@ class AnnotationManager implements AnnotationManagerInterface
     {
         $key = 'A7-MA-'.$className;
         if(!$this->inCache($key)) {
-            $reflectionClass = $this->getReflectionClass($className);
-            $reflectionMethods = $reflectionClass->getMethods();
+            $reflectionMethods = ReflectionUtils::getInstance()->getMethodsReflection($className);
             $methodsAnnotations = [];
             foreach($reflectionMethods as $reflectionMethod) {
                 $methodsAnnotations[$reflectionMethod->getName()] = self::toAssoc($this->annotationReader->getMethodAnnotations($reflectionMethod));
@@ -96,12 +94,6 @@ class AnnotationManager implements AnnotationManagerInterface
     public function scan($directory)
     {
         // TODO: Implement scan() method.
-    }
-
-    private function getReflectionClass($className)
-    {
-        //TODO: Implement getReflectionClass in cache.
-        return new \ReflectionClass($className);
     }
 
     private function inCache($key)
