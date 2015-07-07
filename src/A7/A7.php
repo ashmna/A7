@@ -26,7 +26,7 @@ class A7 implements A7Interface
 
     public function get($class)
     {
-        $class = trim($class, '\\');
+        $class = $this->getRealClassName($class);
 
         if(isset($this->singletonList[$class])) {
             return $this->singletonList[$class];
@@ -100,6 +100,35 @@ class A7 implements A7Interface
         foreach($postProcessors as $postProcessor) {
             $instance = $postProcessor->postProcessAfterInitialization($instance, $class);
         }
+    }
+
+    protected function getRealClassName($class)
+    {
+        $arr = explode('\\', trim($class, '\\'));
+        if(empty($arr)) {
+            $arr = [$class];
+        }
+        $name = $arr[count($arr)-1];
+        $class = $name;
+        array_pop($arr);
+        if(!empty($arr)) {
+            $namespace = implode($arr, '\\');
+            $newClassName = $namespace."\\Impl\\".$name."Impl";
+            if(class_exists($newClassName)) {
+                $class = $newClassName;
+            } else {
+                $newClassName = $namespace."\\Impl\\".$name;
+                if(class_exists($newClassName)) {
+                    $class = $newClassName;
+                } else {
+                    $newClassName = $namespace."\\".$name."Impl";
+                    if(class_exists($newClassName)) {
+                        $class = $newClassName;
+                    }
+                }
+            }
+        }
+        return $class;
     }
 
     protected function isSingleton($class)
