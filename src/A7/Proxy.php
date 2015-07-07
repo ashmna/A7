@@ -42,16 +42,7 @@ class Proxy {
 
 
             foreach($this->a7BeforeCall as $beforeCall) {
-                $callParams = [];
-                foreach((new \ReflectionFunction($beforeCall))->getParameters() as $parameter) {
-                    $parameterName = $parameter->getName();
-                    if(array_key_exists($parameterName, $params)) {
-                        $callParams[] =& $params[$parameterName];
-                    } else {
-                        $callParams[] = null;
-                    }
-                }
-                call_user_func_array($beforeCall, $callParams);
+                $this->a7Call($beforeCall, $params);
             }
 
             if($isCallable) {
@@ -59,16 +50,7 @@ class Proxy {
             }
 
             foreach($this->a7AfterCall as $afterCall) {
-                $callParams = [];
-                foreach((new \ReflectionFunction($afterCall))->getParameters() as $parameter) {
-                    $parameterName = $parameter->getName();
-                    if(array_key_exists($parameterName, $params)) {
-                        $callParams[] =& $params[$parameterName];
-                    } else {
-                        $callParams[] = null;
-                    }
-                }
-                call_user_func_array($afterCall, $callParams);
+                $this->a7Call($afterCall, $params);
             }
 
             return $result;
@@ -128,6 +110,21 @@ class Proxy {
     {
         if(!isset($this->a7Instance)) $this->a7Instance = $this->a7->initClass($this->a7ClassName, true);
         $this->a7DoPostProcessors();
+    }
+
+    protected function a7Call(array $callArr, array $params=[])
+    {
+        list($afterCallClass, $afterCallMethodName) = $callArr;
+        $callParams = [];
+        foreach(ReflectionUtils::getInstance()->getParametersReflection(get_class($afterCallClass), $afterCallMethodName) as $parameter) {
+            $parameterName = $parameter->getName();
+            if(array_key_exists($parameterName, $params)) {
+                $callParams[] =& $params[$parameterName];
+            } else {
+                $callParams[] = null;
+            }
+        }
+        call_user_func_array($callArr, $callParams);
     }
 
 }
