@@ -4,18 +4,18 @@
 namespace A7;
 
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\SimpleAnnotationReader;
 
 class AnnotationManager implements AnnotationManagerInterface
 {
     private $annotationReader;
+    /** @var CacheInterface  */
     private $cache;
 
     public function __construct()
     {
-        $this->cache = [];
+        $this->cache = A7::getCache();
         AnnotationRegistry::registerAutoloadNamespace('A7\Annotations', __DIR__.'/../');
         $this->annotationReader = new SimpleAnnotationReader();
         $this->annotationReader->addNamespace('A7\Annotations');
@@ -98,18 +98,19 @@ class AnnotationManager implements AnnotationManagerInterface
 
     private function inCache($key)
     {
-        return in_array($key, $this->cache);
+        return $this->cache->inCache($key);
     }
 
     private function setCache($key, $value)
     {
-        $this->cache[$key] = $value;
+        $this->cache->setCache($key, $value);
     }
 
     private function getCache($key)
     {
-        return isset($this->cache[$key]) ? $this->cache[$key] : null;
+        return $this->cache->getCache($key);
     }
+
 
     private static function toAssoc($annotations) {
         $newAnnotations = [];

@@ -6,7 +6,8 @@ namespace A7;
 
 class ReflectionUtils implements ReflectionUtilsInterface
 {
-    private $cache = [];
+    /** @var CacheInterface */
+    private $cache;
     private static $instance;
 
     /**
@@ -19,6 +20,12 @@ class ReflectionUtils implements ReflectionUtilsInterface
 
         return static::$instance;
     }
+
+    private function __construct()
+    {
+        $this->cache = new ArrayCache();
+    }
+
     /** @inheritdoc */
     public function getClassReflection($className)
     {
@@ -66,17 +73,17 @@ class ReflectionUtils implements ReflectionUtilsInterface
 
     private function inCache($key)
     {
-        return in_array($key, $this->cache);
+        return $this->cache->inCache($key);
     }
 
     private function setCache($key, $value)
     {
-        $this->cache[$key] = $value;
+        $this->cache->setCache($key, $value);
     }
 
     private function getCache($key)
     {
-        return isset($this->cache[$key]) ? $this->cache[$key] : null;
+        return $this->cache->getCache($key);
     }
 
 }

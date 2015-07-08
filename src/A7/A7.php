@@ -17,9 +17,25 @@ class A7 implements A7Interface
     protected $postProcessManager;
     /** @var AnnotationManagerInterface */
     protected $annotationManager;
+    /** @var CacheInterface */
+    protected static $cache;
 
-    public function __construct()
+    /**
+     * @return CacheInterface
+     */
+    public static function getCache()
     {
+        return self::$cache;
+    }
+
+
+    public function __construct(CacheInterface $cache = null)
+    {
+        if(isset($cache)) {
+            self::$cache = $cache;
+        } else {
+            self::$cache = new ArrayCache();
+        }
         $this->annotationManager  = new AnnotationManager();
         $this->postProcessManager = new PostProcessManager($this, $this->annotationManager);
     }
