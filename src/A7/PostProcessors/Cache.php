@@ -18,6 +18,11 @@ class Cache implements PostProcessInterface
     protected $cache = [];
     function postProcessBeforeInitialization($instance, $className)
     {
+        return $instance;
+    }
+
+    function postProcessAfterInitialization($instance, $className)
+    {
         /** @var \A7\Annotations\Cache $cache */
         $cache = $this->annotationManager->getClassAnnotation($className, 'Cache');
 
@@ -33,14 +38,9 @@ class Cache implements PostProcessInterface
         return $instance;
     }
 
-    function postProcessAfterInitialization($instance, $className)
-    {
-        return $instance;
-    }
-
     function beforeCall($arguments, $methodName, $className, &$isCallable, &$result, &$params)
     {
-        $hash = md5(json_encode($arguments));
+        $hash = md5(serialize($arguments));
         $key = "$className-$methodName-$hash";
         if(isset($this->cache[$key])) {
             $result = $this->cache[$key];
@@ -52,7 +52,7 @@ class Cache implements PostProcessInterface
 
     function afterCall($arguments, $methodName, $className, &$result, $params)
     {
-        $hash = md5(json_encode($arguments));
+        $hash = md5(serialize($arguments));
         $key = "$className-$methodName-$hash";
         if(!empty($params['add_to_cache'])) {
             $this->cache[$key] = $result;

@@ -12,4 +12,5 @@ namespace A7\Annotations;
 final class Cache {
     public $enable = true;
     public $key;
+    public $ttl;
 }

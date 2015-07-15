@@ -16,8 +16,7 @@ class MemcachedCache implements CacheInterface
 
     function inCache($key)
     {
-        $val = $this->memcached->get($key);
-        return $val !== false;
+        return $this->memcached->get($key)!==false || $this->memcached->getResultCode() != \Memcached::RES_NOTFOUND;
     }
 
     function setCache($key, $value)
@@ -33,6 +32,7 @@ class MemcachedCache implements CacheInterface
 
     function clear()
     {
+        $this->memcached->flush();
 //        $val = $this->memcached->get($key);
 //        if($val !== false) {
 //            $this->memcached->delete($key);

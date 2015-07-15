@@ -115,16 +115,7 @@ class Proxy {
     protected function a7Call(array $callArr, array $params=[])
     {
         list($afterCallClass, $afterCallMethodName) = $callArr;
-        $callParams = [];
-        foreach(ReflectionUtils::getInstance()->getParametersReflection(get_class($afterCallClass), $afterCallMethodName) as $parameter) {
-            $parameterName = $parameter->getName();
-            if(array_key_exists($parameterName, $params)) {
-                $callParams[] =& $params[$parameterName];
-            } else {
-                $callParams[] = null;
-            }
-        }
-        call_user_func_array($callArr, $callParams);
+        $this->a7->call($afterCallClass, $afterCallMethodName, $params);
     }
 
 }

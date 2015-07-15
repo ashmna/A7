@@ -61,7 +61,19 @@ class A7 implements A7Interface
 
     public function call($class, $method, array $arguments)
     {
-        // TODO: Implement call() method.
+        if(!is_object($class)) {
+            $class = $this->get($class);
+        }
+        $callParams = [];
+        foreach(ReflectionUtils::getInstance()->getParametersReflection(get_class($class), $method) as $parameter) {
+            $parameterName = $parameter->getName();
+            if(array_key_exists($parameterName, $arguments)) {
+                $callParams[] =& $arguments[$parameterName];
+            } else {
+                $callParams[] = null;
+            }
+        }
+        return call_user_func_array([$class, $method], $callParams);
     }
 
     public function enablePostProcessor($postProcessor, array $parameters = [])
