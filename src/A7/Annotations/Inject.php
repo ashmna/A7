@@ -63,4 +63,11 @@ final class Inject
         return $this->parameters;
     }
 
+    public function setVar($var)
+    {
+        if(empty($this->name)) {
+            $this->name = $var;
+        }
+    }
+
 }

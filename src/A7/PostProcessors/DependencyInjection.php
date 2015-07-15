@@ -42,6 +42,10 @@ class DependencyInjection implements PostProcessInterface
                 $inject = $annotations['Inject'];
                 $reflectionProperty = new \ReflectionProperty($instance, $propertyName);
                 $reflectionProperty->setAccessible(true);
+                if(isset($annotations['var'])) {
+                    $inject->setVar($annotations['var']);
+                }
+                $inject->isInjectObject();
                 if($inject->isInjectObject()) {
                     $reflectionProperty->setValue($instance, $this->a7->get($inject->getName()));
                 } else {
