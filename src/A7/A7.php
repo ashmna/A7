@@ -68,9 +68,12 @@ class A7 implements A7Interface
         foreach(ReflectionUtils::getInstance()->getParametersReflection(get_class($class), $method) as $parameter) {
             $parameterName = $parameter->getName();
             if(array_key_exists($parameterName, $arguments)) {
+                if($parameter->isArray()) {
+                    $arguments[$parameterName] =& (array)$arguments[$parameterName];
+                }
                 $callParams[] =& $arguments[$parameterName];
             } else {
-                $callParams[] = null;
+                $callParams[] = $parameter->isArray() ? [] : null;
             }
         }
         return call_user_func_array([$class, $method], $callParams);
