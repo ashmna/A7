@@ -69,7 +69,7 @@ class A7 implements A7Interface
             $parameterName = $parameter->getName();
             if(array_key_exists($parameterName, $arguments)) {
                 if($parameter->isArray()) {
-                    $arguments[$parameterName] =& (array)$arguments[$parameterName];
+                    $arguments[$parameterName] = (array)$arguments[$parameterName];
                 }
                 $callParams[] =& $arguments[$parameterName];
             } else {
