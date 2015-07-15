@@ -1,6 +1,6 @@
 {
-  "name": "ashmna/lotto",
-  "description": "Random lotto platform for all",
+  "name": "ashmna/a7",
+  "description": "PHP AOP mini helper",
   "minimum-stability": "dev",
   "autoload" : {
     "psr-4": {
