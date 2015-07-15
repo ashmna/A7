@@ -73,7 +73,13 @@ class A7 implements A7Interface
                 }
                 $callParams[] =& $arguments[$parameterName];
             } else {
-                $callParams[] = $parameter->isArray() ? [] : null;
+                $val = null;
+                if($parameter->isDefaultValueAvailable()) {
+                    $val = $parameter->getDefaultValue();
+                } elseif($parameter->isArray()) {
+                    $val = [];
+                }
+                $callParams[] = $val;
             }
         }
         return call_user_func_array([$class, $method], $callParams);
