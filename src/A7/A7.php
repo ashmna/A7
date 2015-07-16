@@ -106,7 +106,7 @@ class A7 implements A7Interface
         }
 
         if(!$instanceOnly) {
-            $this->doPostProcessors($instance, $class, $this->postProcessors);
+            $instance = $this->doPostProcessors($instance, $class, $this->postProcessors);
         }
 
         if($instanceOnly && $this->isSingleton($class)) {
@@ -137,6 +137,8 @@ class A7 implements A7Interface
         foreach($postProcessors as $postProcessor) {
             $instance = $postProcessor->postProcessAfterInitialization($instance, $class);
         }
+
+        return $instance;
     }
 
     protected function getRealClassName($class)
