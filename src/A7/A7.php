@@ -65,7 +65,8 @@ class A7 implements A7Interface
             $class = $this->get($class);
         }
         $callParams = [];
-        foreach(ReflectionUtils::getInstance()->getParametersReflection(get_class($class), $method) as $parameter) {
+        $className = $class instanceof Proxy ? $class->a7getClass() : get_class($class);
+        foreach(ReflectionUtils::getInstance()->getParametersReflection($className, $method) as $parameter) {
             $parameterName = $parameter->getName();
             if(array_key_exists($parameterName, $arguments)) {
                 if($parameter->isArray()) {

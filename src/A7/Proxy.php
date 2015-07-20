@@ -111,6 +111,10 @@ class Proxy {
         $this->a7Init();
         return method_exists($this->a7Instance, $methodName);
     }
+    public function a7getClass()
+    {
+        return $this->a7ClassName;
+    }
 
     protected function a7Init()
     {
