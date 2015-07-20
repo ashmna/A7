@@ -10,5 +10,5 @@ interface A7Interface
     function enablePostProcessor($postProcessor);
     function disablePostProcessor($postProcessor);
     function initClass($class, $checkLazy = true);
-    function doPostProcessors($instance, $class, array $postProcessors);
+    function doPostProcessors($instance, $class, array $postProcessors, $proxyInstance = null);
 }

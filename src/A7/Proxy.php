@@ -101,9 +101,15 @@ class Proxy {
     public function a7DoPostProcessors()
     {
         if(isset($this->a7Instance) && !empty($this->a7PostProcessors)) {
-            $this->a7->doPostProcessors($this->a7Instance, $this->a7ClassName, $this->a7PostProcessors);
+            $this->a7Instance = $this->a7->doPostProcessors($this->a7Instance, $this->a7ClassName, $this->a7PostProcessors, $this);
             $this->a7PostProcessors = [];
         }
+    }
+
+    public function a7methodExists($methodName)
+    {
+        $this->a7Init();
+        return method_exists($this->a7Instance, $methodName);
     }
 
     protected function a7Init()

@@ -120,8 +120,10 @@ class A7 implements A7Interface
      * @param $instance
      * @param $class
      * @param PostProcessInterface[] $postProcessors
+     * @param null|Proxy $proxyInstance
+     * @return mixed
      */
-    public function doPostProcessors($instance, $class, array $postProcessors)
+    public function doPostProcessors($instance, $class, array $postProcessors, $proxyInstance = null)
     {
         foreach($postProcessors as $postProcessor) {
             $instance = $postProcessor->postProcessBeforeInitialization($instance, $class);
@@ -135,10 +137,22 @@ class A7 implements A7Interface
         }
 
         foreach($postProcessors as $postProcessor) {
-            $instance = $postProcessor->postProcessAfterInitialization($instance, $class);
+            if(isset($proxyInstance)) {
+                $postProcessor->postProcessAfterInitialization($proxyInstance, $class);
+            } else {
+                $instance = $postProcessor->postProcessAfterInitialization($instance, $class);
+            }
         }
 
         return $instance;
+    }
+
+    public static function methodExists($class, $methodName) {
+        if($class instanceof Proxy) {
+            return $class->a7methodExists($methodName);
+        } else {
+            return method_exists($class, $methodName);
+        }
     }
 
     protected function getRealClassName($class)

@@ -4,7 +4,6 @@
 namespace A7\PostProcessors;
 
 
-use A7\AnnotationManagerInterface;
 use A7\PostProcessInterface;
 use A7\Proxy;
 
@@ -24,7 +23,7 @@ class Logger implements PostProcessInterface {
         }
 
         $instance->a7AddBeforeCall([$this, 'beforeCall']);
-        $instance->a7AddAfterCall( [$this, 'afterCall'] );
+        $instance->a7AddAfterCall ([$this, 'afterCall' ]);
 
         return $instance;
     }
