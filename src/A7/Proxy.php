@@ -46,7 +46,11 @@ class Proxy {
             }
 
             if($isCallable) {
-                $result = call_user_func_array([$this->a7Instance, $methodName], $arguments);
+                $newArgs = [];
+                foreach($arguments as &$val) {
+                    $newArgs[] =& $val;
+                }
+                $result = call_user_func_array([$this->a7Instance, $methodName], $newArgs);
             }
 
             foreach($this->a7AfterCall as $afterCall) {
