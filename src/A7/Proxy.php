@@ -52,15 +52,16 @@ class Proxy {
                     $result = call_user_func_array([$this->a7Instance, $methodName], $arguments);
                 }
             } catch(\Exception $exception) {
-                $params['exception'] = $exception;
+                $params['exception'] = &$exception;
                 foreach($this->a7ExceptionHandling as $exceptionHandling) {
                     $this->a7Call($exceptionHandling, $params);
                 }
                 throw $exception;
             }
 
-
-
+            foreach($this->a7AfterCall as $afterCall) {
+                $this->a7Call($afterCall, $params);
+            }
 
             return $result;
         } else {
