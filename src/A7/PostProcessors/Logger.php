@@ -21,6 +21,7 @@ class Logger implements PostProcessInterface {
             if(isset($parameters['configure'])) {
                 \Logger::configure($parameters['configure']);
             } else {
+                $file = isset($parameters['configure']) ? $parameters['configure'] : 'site-%s.html' ;
                 \Logger::configure([
                     'appenders'  => [
                         'default' => [
@@ -30,7 +31,7 @@ class Logger implements PostProcessInterface {
                             ],
                             'params' => [
                                 'datePattern' => 'Y-m-d',
-                                'file'        => 'file-%s.html',
+                                'file'        => $file,
                             ],
                         ],
                     ],
@@ -49,21 +50,20 @@ class Logger implements PostProcessInterface {
             $instance = new Proxy($this->a7, $className, $instance);
         }
 
-        $instance->a7AddBeforeCall([$this, 'beforeCall']);
-        $instance->a7AddAfterCall ([$this, 'afterCall' ]);
+        //$instance->a7AddBeforeCall([$this, 'beforeCall']);
+        $instance->a7AddAfterCall([$this, 'afterCall' ]);
+        $instance->a7AddExceptionHandling([$this, 'exceptionHandling' ]);
 
         return $instance;
     }
 
 
-    function beforeCall($className, $methodName, $arguments, &$params) {
-        $argumentsString = var_export($arguments, true);
-        $this->log->info("$className->$methodName();  arguments: $argumentsString");
-        $params['startTime'] = microtime(true);
+    function afterCall($className, $methodName) {
+        $this->log->info("$className->$methodName()");
     }
 
-    function afterCall($className, $methodName) {
-        $this->log->info("END $className->$methodName()");
+    function exceptionHandling($className, $methodName, $exception) {
+        $this->log->error("$className->$methodName()", $exception);
     }
 
 

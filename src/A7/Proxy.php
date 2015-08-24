@@ -14,6 +14,8 @@ class Proxy {
     protected $a7ClassName;
     protected $a7BeforeCall = [];
     protected $a7AfterCall  = [];
+    protected $a7ExceptionHandling = [];
+
 
     public function __construct(A7Interface $a7, $className, $instance = null)
     {
@@ -45,17 +47,20 @@ class Proxy {
                 $this->a7Call($beforeCall, $params);
             }
 
-            if($isCallable) {
-                $newArgs = [];
-                foreach($arguments as &$val) {
-                    $newArgs[] =& $val;
+            try {
+                if($isCallable) {
+                    $result = call_user_func_array([$this->a7Instance, $methodName], $arguments);
                 }
-                $result = call_user_func_array([$this->a7Instance, $methodName], $newArgs);
+            } catch(\Exception $exception) {
+                $params['exception'] = $exception;
+                foreach($this->a7ExceptionHandling as $exceptionHandling) {
+                    $this->a7Call($exceptionHandling, $params);
+                }
+                throw $exception;
             }
 
-            foreach($this->a7AfterCall as $afterCall) {
-                $this->a7Call($afterCall, $params);
-            }
+
+
 
             return $result;
         } else {
@@ -94,6 +99,13 @@ class Proxy {
     {
         if(is_callable($afterCallFunction)) {
             $this->a7AfterCall[] = $afterCallFunction;
+        }
+    }
+
+    public function a7AddExceptionHandling($exceptionHandling)
+    {
+        if(is_callable($exceptionHandling)) {
+            $this->a7ExceptionHandling[] = $exceptionHandling;
         }
     }
 
