@@ -30,7 +30,7 @@ class Logger implements PostProcessInterface {
                             ],
                             'params' => [
                                 'datePattern' => 'Y-m-d',
-                                'file'        => 'file-%s.log',
+                                'file'        => 'file-%s.html',
                             ],
                         ],
                     ],
@@ -62,12 +62,8 @@ class Logger implements PostProcessInterface {
         $params['startTime'] = microtime(true);
     }
 
-    function afterCall($className, $methodName, $result, &$params) {
-        $endTime   = microtime(true);
-        $startTime = $params['startTime'];
-        $executeTime = $endTime - $startTime;
-        $resultString = var_export($result, true);
-        $this->log->info("$className->$methodName();  executeTime: $executeTime, result: $resultString");
+    function afterCall($className, $methodName) {
+        $this->log->info("END $className->$methodName()");
     }
 
 
