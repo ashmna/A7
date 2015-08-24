@@ -51,23 +51,25 @@ class Logger implements PostProcessInterface {
             $instance = new Proxy($this->a7, $className, $instance);
         }
 
-        $instance->a7AddBeforeCall([$this, 'beforeCall']);
-        $instance->a7AddAfterCall([$this, 'afterCall']);
+        if(strpos($className, 'Service') !== false) {
+            $instance->a7AddBeforeCall([$this, 'beforeCall']);
+            $instance->a7AddAfterCall([$this, 'afterCall']);
+        }
         $instance->a7AddExceptionHandling([$this, 'exceptionHandling']);
 
         return $instance;
     }
 
     function beforeCall($className, $methodName) {
-        $this->log->info("Start $className->$methodName()");
+        $this->log->info("Start $className->$methodName");
     }
 
     function afterCall($className, $methodName) {
-        $this->log->info("End   $className->$methodName()");
+        $this->log->info("End   $className->$methodName");
     }
 
     function exceptionHandling($className, $methodName, $exception) {
-        $this->log->error("$className->$methodName()", $exception);
+        $this->log->error("$className->$methodName", $exception);
     }
 
 
