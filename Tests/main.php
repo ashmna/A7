@@ -7,43 +7,78 @@ if(!class_exists('Memcached')) {
 
 require_once  'AffiliatesImpl.php';
 
-$a7 = new \A7\A7();
-$a7->enablePostProcessor('DependencyInjection', [
-    'partner.id' => 5,
-]);
+$m = new Memcached();
+$m->addServer('localhost', 11211);
 
-//$a7->enablePostProcessor('Logger');
-$a7->enablePostProcessor('Cache');
-
-/** @var AffiliatesImpl $s */
-$s = $a7->get('AffiliatesImpl');
-
-
-
-echo $s->kuku('call 1');
-echo $s->kuku('call 1');
-echo $s->kuku('call 2');
-echo $s->kuku('call 2');
-echo $s->kuku('call 1');
-echo $s->kuku('call 1');
-echo $s->kuku('call 1');
-
-var_dump($s);
+$cache = new \A7\MemcachedCache($m);
+//$cache = new \A7\ArrayCache();
+//$a7 = new \A7\A7($cache);
+//
+//$a7->enablePostProcessor('DependencyInjection', [
+//    'partner.id' => 5,
+//]);
+//
+//$a7->enablePostProcessor('Cache');
+//
+///** @var AffiliatesImpl $s */
+//$s = $a7->get('AffiliatesImpl');
 
 
 
 
+$start = microtime(true);
+
+for($i=0; $i<1500; ++$i) {
+
+    $cache = new \A7\ArrayCache();
+
+    $a7 = new \A7\A7($cache);
+
+    $a7->enablePostProcessor('DependencyInjection', [
+        'partner.id' => 5,
+    ]);
+
+    $a7->enablePostProcessor('Cache', [
+
+    ]);
+
+    /** @var AffiliatesImpl $s */
+    $s = $a7->get('AffiliatesImpl');
+}
 
 
 
+$end = microtime(true);
+$ArrayCache = $end - $start ;
+echo ' ArrayCache  '.$ArrayCache.' ms';
+
+$start = microtime(true);
+
+for($i=0; $i<1500; ++$i) {
+    $cache = new \A7\MemcachedCache($m);
+
+    $a7 = new \A7\A7($cache);
+
+    $a7->enablePostProcessor('DependencyInjection', [
+        'partner.id' => 5,
+    ]);
+
+    $a7->enablePostProcessor('Cache');
+
+    /** @var AffiliatesImpl $s */
+    $s = $a7->get('AffiliatesImpl');
+}
 
 
 
+$end = microtime(true);
+$MemcachedCache = $end - $start ;
 
-
-
-
-
+echo "\n";
+echo ' MemcachedCache '.$MemcachedCache .' ms';
+echo "\n\n\n\n";
+$t = $ArrayCache/$MemcachedCache;
+echo ' ArrayCache / MemcachedCache '. $t;
 
 
 

@@ -12,8 +12,35 @@ class Logger implements PostProcessInterface {
     private $a7;
     private $parameters;
 
+    /** @var \LoggerRoot */
+    private $log;
+
 
     function postProcessBeforeInitialization($instance, $className) {
+        if (!isset($this->log)) {
+            if(isset($parameters['configure'])) {
+                \Logger::configure($parameters['configure']);
+            } else {
+                \Logger::configure([
+                    'appenders'  => [
+                        'default' => [
+                            'class'  => 'LoggerAppenderDailyFile',
+                            'layout' => [
+                                'class' => 'LoggerLayoutHtml',
+                            ],
+                            'params' => [
+                                'datePattern' => 'Y-m-d',
+                                'file'        => 'file-%s.log',
+                            ],
+                        ],
+                    ],
+                    'rootLogger' => [
+                        'appenders' => ['default'],
+                    ],
+                ]);
+            }
+            $this->log = \Logger::getRootLogger();
+        }
         return $instance;
     }
 
@@ -31,8 +58,7 @@ class Logger implements PostProcessInterface {
 
     function beforeCall($className, $methodName, $arguments, &$params) {
         $argumentsString = var_export($arguments, true);
-        $date = date('Y-m-d H:i:s');
-        file_put_contents($this->parameters['path'], "$date: $className->$methodName  arguments: \n$argumentsString\n", FILE_APPEND);
+        $this->log->info("$className->$methodName();  arguments: $argumentsString");
         $params['startTime'] = microtime(true);
     }
 
@@ -40,9 +66,8 @@ class Logger implements PostProcessInterface {
         $endTime   = microtime(true);
         $startTime = $params['startTime'];
         $executeTime = $endTime - $startTime;
-        $date = date('Y-m-d H:i:s');
         $resultString = var_export($result, true);
-        file_put_contents($this->parameters['path'], "$date: $className->$methodName  executeTime: $executeTime, result:\n$resultString\n", FILE_APPEND);
+        $this->log->info("$className->$methodName();  executeTime: $executeTime, result: $resultString");
     }
 
 
