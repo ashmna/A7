@@ -18,10 +18,11 @@ class Logger implements PostProcessInterface {
 
     function postProcessBeforeInitialization($instance, $className) {
         if (!isset($this->log)) {
-            if(isset($parameters['configure'])) {
-                \Logger::configure($parameters['configure']);
+            if(isset($this->parameters['configure'])) {
+                \Logger::configure($this->parameters['configure']);
             } else {
-                $file = isset($parameters['configure']) ? $parameters['configure'] : 'site-%s.html' ;
+                $file = isset($this->parameters['file']) ? $this->parameters['file'] : 'site-%s.html';
+
                 \Logger::configure([
                     'appenders'  => [
                         'default' => [
@@ -51,8 +52,8 @@ class Logger implements PostProcessInterface {
         }
 
         //$instance->a7AddBeforeCall([$this, 'beforeCall']);
-        $instance->a7AddAfterCall([$this, 'afterCall' ]);
-        $instance->a7AddExceptionHandling([$this, 'exceptionHandling' ]);
+        $instance->a7AddAfterCall([$this, 'afterCall']);
+        $instance->a7AddExceptionHandling([$this, 'exceptionHandling']);
 
         return $instance;
     }
