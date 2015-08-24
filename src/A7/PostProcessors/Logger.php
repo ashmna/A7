@@ -50,8 +50,12 @@ class Logger implements PostProcessInterface {
         if(!($instance instanceof Proxy)) {
             $instance = new Proxy($this->a7, $className, $instance);
         }
+        $ab = true;
+        if(isset($this->parameters['classPath'])){
+            $ab = strpos($className, $this->parameters['classPath']) !== 0;
+        }
 
-        if(strpos($className, 'Service') !== false) {
+        if($ab) {
             $instance->a7AddBeforeCall([$this, 'beforeCall']);
             $instance->a7AddAfterCall([$this, 'afterCall']);
         }
