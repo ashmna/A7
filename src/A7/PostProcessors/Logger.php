@@ -52,7 +52,7 @@ class Logger implements PostProcessInterface {
         }
         $ab = true;
         if(isset($this->parameters['classPath'])){
-            $ab = strpos($className, $this->parameters['classPath']) !== 0;
+            $ab = strpos($className, $this->parameters['classPath']) === 0;
         }
 
         if($ab) {
