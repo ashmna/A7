@@ -79,27 +79,33 @@ class Transaction implements PostProcessInterface
     }
 
 
-    public function beginTransaction() {
-        //TODO: check method annotation disable
-
-        if(isset($this->DBInstance) && method_exists($this->DBInstance, $this->beginTransaction)) {
-            call_user_func([$this->DBInstance, $this->beginTransaction]);
+    public function beginTransaction($className, $methodName) {
+        /** @var \A7\Annotations\Transactional $transactional */
+        $transactional = $this->annotationManager->getMethodAnnotation($className, $methodName, 'Transactional');
+        if(!isset($transactional) || $transactional->isEnabled()) {
+            if(isset($this->DBInstance) && method_exists($this->DBInstance, $this->beginTransaction)) {
+                call_user_func([$this->DBInstance, $this->beginTransaction]);
+            }
         }
     }
 
-    public function commit() {
-        //TODO: check method annotation disable
-
-        if(isset($this->DBInstance) && method_exists($this->DBInstance, $this->commit)) {
-            call_user_func([$this->DBInstance, $this->commit]);
+    public function commit($className, $methodName) {
+        /** @var \A7\Annotations\Transactional $transactional */
+        $transactional = $this->annotationManager->getMethodAnnotation($className, $methodName, 'Transactional');
+        if(!isset($transactional) || $transactional->isEnabled()) {
+            if (isset($this->DBInstance) && method_exists($this->DBInstance, $this->commit)) {
+                call_user_func([$this->DBInstance, $this->commit]);
+            }
         }
     }
 
-    public function rollback() {
-        //TODO: check method annotation disable
-
-        if(isset($this->DBInstance) && method_exists($this->DBInstance, $this->rollback)) {
-            call_user_func([$this->DBInstance, $this->rollback]);
+    public function rollback($className, $methodName) {
+        /** @var \A7\Annotations\Transactional $transactional */
+        $transactional = $this->annotationManager->getMethodAnnotation($className, $methodName, 'Transactional');
+        if(!isset($transactional) || $transactional->isEnabled()) {
+            if (isset($this->DBInstance) && method_exists($this->DBInstance, $this->rollback)) {
+                call_user_func([$this->DBInstance, $this->rollback]);
+            }
         }
     }
 
