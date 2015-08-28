@@ -9,7 +9,8 @@ namespace A7\Annotations;
  * @Annotation
  * @package A7\Annotations
  */
-final class Cache {
+final class Cache
+{
     public $enable = true;
     public $key;
     public $ttl;
