@@ -130,10 +130,13 @@ class A7 implements A7Interface
             $instance = $postProcessor->postProcessBeforeInitialization($instance, $class);
         }
 
-        $methodsAnnotations = $this->annotationManager->getMethodsAnnotations(get_class($instance));
+        $className = get_class($instance);
+        $methodsAnnotations = $this->annotationManager->getMethodsAnnotations($className);
         foreach($methodsAnnotations as $method => $annotations) {
             if(isset($annotations['Init'])) {
-                call_user_func_array([$instance, $method], []);
+                $methodReflection = ReflectionUtils::getInstance()->getMethodReflection($className, $method);
+                $methodReflection->setAccessible(true);
+                $methodReflection->invoke($instance);
             }
         }
 
@@ -159,9 +162,6 @@ class A7 implements A7Interface
     protected function getRealClassName($class)
     {
         $arr = explode('\\', trim($class, '\\'));
-        if(empty($arr)) {
-            $arr = [$class];
-        }
         $name = $arr[count($arr)-1];
         $class = implode($arr, '\\');
         if(!class_exists($class)) {

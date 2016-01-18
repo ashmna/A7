@@ -80,4 +80,11 @@ Vagrant.configure(2) do |config|
     # sudo 'zend_extension="/usr/lib/php5/20121212/xdebug.so"' >> /etc/php5/fpm/php.ini
     sudo service php5-fpm restart
   SHELL
+  # sudo nano /etc/php5/cli/conf.d/xdebug.ini
+  # sudo nano /etc/php5/fpm/conf.d/xdebug.ini
+  # [Xdebug]
+  # zend_extension="/usr/lib/php5/20121212+lfs/xdebug.so"
+  # xdebug.remote_enable=on
+  # xdebug.remote_connect_back=on
+  # xdebug.extended_info=1
 end
