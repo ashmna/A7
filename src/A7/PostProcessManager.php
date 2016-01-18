@@ -3,10 +3,12 @@
 
 namespace A7;
 
-
 class PostProcessManager implements PostProcessManagerInterface
 {
+    /** @var A7Interface */
     protected $a7;
+    /** @var AnnotationManagerInterface */
+    protected $annotationManager;
 
     function __construct(A7Interface $a7, AnnotationManagerInterface $annotationManager) {
         $this->a7 = $a7;

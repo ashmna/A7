@@ -4,8 +4,8 @@
   "minimum-stability": "dev",
   "autoload" : {
     "psr-4": {
-      "Lotto\\" : "src/Lotto",
-      "A7\\" : "src/A7"
+      "A7\\" : "src/A7",
+      "A7\\Tests\\" : "Tests"
     }
   },
   "authors": [
@@ -17,5 +17,8 @@
   "require": {
     "doctrine/annotations": "1.3.x-dev",
     "apache/log4php": "2.3.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit" : "*"
   }
 }
