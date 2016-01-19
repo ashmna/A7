@@ -191,9 +191,88 @@ class A7Test extends AbstractUnitTestCase
         $this->assertInstanceOf($className, $object);
     }
 
+    /**
+     * @expectedException \Exception
+     */
+    public function testGetWithException()
+    {
+        // Test data
+        $className = 'EmptyClass';
+        // Run Test
+        try {
+            $this->a7->get($className);
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('\Exception', $e);
+            $this->assertEquals('EmptyClass class not found', $e->getMessage());
+            throw $e;
+        }
+    }
+
+    public function testGetWithSingletonList()
+    {
+        // Test data
+        $className = 'A7\Tests\Resources\EmptyClass7';
+        $injectable = new Injectable();
+        $injectable->lazy = false;
+        // Expectations
+        $this->annotationManager
+            ->expects($this->exactly(2))
+            ->method("getClassAnnotation")
+            ->with($className, "Injectable")
+            ->willReturn($injectable);
+        $this->annotationManager
+            ->expects($this->once())
+            ->method("getMethodsAnnotations")
+            ->with($className)
+            ->willReturn([]);
+        // Run Test
+        $object1 = $this->a7->get($className);
+        $this->assertInstanceOf($className, $object1);
+        $object2 = $this->a7->get($className);
+        $this->assertInstanceOf($className, $object2);
+        $this->assertEquals($object1, $object2);
+    }
+
     public function testCall()
     {
-        //$class, $method, array $arguments
+        // Test Data
+        $className = 'A7\Tests\Resources\EmptyClass8';
+        $injectable = new Injectable();
+        $injectable->lazy = false;
+        $arguments = [
+            'key'  => 'value',
+            'key1' => 'value1',
+            'key2' => 'value2',
+            'key3' => 'value3',
+        ];
+        // Expectations
+        $this->annotationManager
+            ->expects($this->exactly(2))
+            ->method("getClassAnnotation")
+            ->with($className, "Injectable")
+            ->willReturn($injectable);
+        $this->annotationManager
+            ->expects($this->once())
+            ->method("getMethodsAnnotations")
+            ->with($className)
+            ->willReturn([]);
+        // Run Test
+        $res = $this->a7->call($className, 'methodReturnTrue', []);
+        $this->assertTrue($res);
+        $res = $this->a7->call($className, 'methodReturnTrue', $arguments);
+        $this->assertTrue($res);
+        $res = $this->a7->call($className, 'returnArguments', $arguments);
+        $this->assertEquals($res, []);
+        $res = $this->a7->call($className, 'returnAgr', $arguments);
+        $this->assertEquals($res, 'value');
+        $res = $this->a7->call($className, 'returnAgrArray', $arguments);
+        $this->assertEquals($res, ['value']);
+        $res = $this->a7->call($className, 'returnAgrDefaultValue', []);
+        $this->assertEquals($res, 10);
+        $res = $this->a7->call($className, 'returnAgrDefaultValueArray', []);
+        $this->assertEquals($res, []);
+        $res = $this->a7->call(new \A7\Tests\Resources\EmptyClass8(), 'methodReturnTrue', []);
+        $this->assertTrue($res);
     }
 
     public function testEnablePostProcessor()
