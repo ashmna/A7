@@ -9,6 +9,7 @@ use A7\A7;
 use A7\Annotations\Init;
 use A7\Annotations\Injectable;
 use A7\Tests\Resources\AbstractUnitTestCase;
+use A7\Tests\Resources\EmptyClass8;
 
 class A7Test extends AbstractUnitTestCase
 {
@@ -271,7 +272,7 @@ class A7Test extends AbstractUnitTestCase
         $this->assertEquals($res, 10);
         $res = $this->a7->call($className, 'returnAgrDefaultValueArray', []);
         $this->assertEquals($res, []);
-        $res = $this->a7->call(new \A7\Tests\Resources\EmptyClass8(), 'methodReturnTrue', []);
+        $res = $this->a7->call(new EmptyClass8(), 'methodReturnTrue', []);
         $this->assertTrue($res);
     }
 

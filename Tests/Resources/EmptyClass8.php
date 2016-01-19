@@ -31,7 +31,7 @@ class EmptyClass8 {
         return $key;
     }
 
-    public function returnAgrDefaultValueArray(array $key = [])
+    public function returnAgrDefaultValueArray(array $key)
     {
         return $key;
     }
