@@ -10,7 +10,7 @@ class ArrayCache implements CacheInterface
 
     public function inCache($key)
     {
-        return in_array($key, $this->data);
+        return array_key_exists($key, $this->data);
     }
 
     public function setCache($key, $value)
