@@ -3,13 +3,16 @@
 namespace A7\Tests\Unit;
 
 require_once dirname(__DIR__)."/Resources/EmptyClass6.php";
+require_once dirname(__DIR__)."/Resources/SomePostProcess.php";
 
 
 use A7\A7;
 use A7\Annotations\Init;
 use A7\Annotations\Injectable;
+use A7\PostProcessors\SomePostProcess;
 use A7\Tests\Resources\AbstractUnitTestCase;
 use A7\Tests\Resources\EmptyClass8;
+use A7\Tests\Resources\Impl\EmptyClass1Impl;
 
 class A7Test extends AbstractUnitTestCase
 {
@@ -263,37 +266,73 @@ class A7Test extends AbstractUnitTestCase
         $res = $this->a7->call($className, 'methodReturnTrue', $arguments);
         $this->assertTrue($res);
         $res = $this->a7->call($className, 'returnArguments', $arguments);
-        $this->assertEquals($res, []);
+        $this->assertEquals([], $res);
         $res = $this->a7->call($className, 'returnAgr', $arguments);
-        $this->assertEquals($res, 'value');
+        $this->assertEquals('value', $res);
         $res = $this->a7->call($className, 'returnAgrArray', $arguments);
-        $this->assertEquals($res, ['value']);
+        $this->assertEquals(['value'], $res);
         $res = $this->a7->call($className, 'returnAgrDefaultValue', []);
-        $this->assertEquals($res, 10);
+        $this->assertEquals(10, $res);
         $res = $this->a7->call($className, 'returnAgrDefaultValueArray', []);
-        $this->assertEquals($res, []);
+        $this->assertEquals([], $res);
         $res = $this->a7->call(new EmptyClass8(), 'methodReturnTrue', []);
         $this->assertTrue($res);
     }
 
-    public function testEnablePostProcessor()
+    public function testEnableAndDisablePostProcessor()
     {
-        //$postProcessor, array $parameters = []
+        // Test Data
+        $postProcess = 'SomePostProcess';
+        $postProcessInstance = new SomePostProcess();
+        $parameters = [];
+        // Expectations
+        $this->postProcessManager
+            ->expects($this->once())
+            ->method('getPostProcessInstance')
+            ->with($postProcess, $parameters)
+            ->willReturn($postProcessInstance);
+        // Run Test
+        $this->a7->enablePostProcessor($postProcess);
+        $postProcessors = $this->getMember($this->a7, 'postProcessors');
+        $this->assertEquals([$postProcess => $postProcessInstance], $postProcessors);
+        $this->a7->disablePostProcessor($postProcess);
+        $postProcessors = $this->getMember($this->a7, 'postProcessors');
+        $this->assertEquals([], $postProcessors);
     }
 
-    public function testDisablePostProcessor()
+    public function testInitClassWithInstanceOnly()
     {
-        //$postProcessor
-    }
-
-    public function testInitClass()
-    {
-        //$class, $checkLazy = true
+        // Test Data
+        $class = 'A7\Tests\Resources\Impl\EmptyClass1Impl';
+        $instanceOnly = true;
+        $injectable = new Injectable();
+        // Expectations
+        $this->annotationManager
+            ->expects($this->once())
+            ->method("getClassAnnotation")
+            ->with($class, "Injectable")
+            ->willReturn($injectable);
+        // Run Test
+        $object = $this->a7->initClass($class, $instanceOnly);
+        $this->assertInstanceOf($class, $object);
     }
 
     public function testDoPostProcessors()
     {
         //$instance, $class, array $postProcessors, $proxyInstance = null
+        // Test Data
+        $class = 'A7\Tests\Resources\Impl\EmptyClass1Impl';
+        $instance = new EmptyClass1Impl();
+        $postProcessors = [];
+        // Expectations
+        $this->annotationManager
+            ->expects($this->once())
+            ->method("getMethodsAnnotations")
+            ->with($class)
+            ->willReturn([]);
+        // Run Test
+        $object = $this->a7->doPostProcessors($instance, $class, $postProcessors);
+        $this->assertInstanceOf($class, $object);
     }
 
 
