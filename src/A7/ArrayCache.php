@@ -6,6 +6,7 @@ namespace A7;
 
 class ArrayCache implements CacheInterface
 {
+
     protected $data = [];
 
     public function inCache($key)
@@ -27,4 +28,5 @@ class ArrayCache implements CacheInterface
     {
         $this->data = [];
     }
+
 }

@@ -5,7 +5,8 @@ namespace A7\Tests\Unit;
 
 use A7\Tests\Resources\AbstractUnitTestCase;
 
-abstract class AbstractCacheTest extends AbstractUnitTestCase {
+abstract class AbstractCacheTest extends AbstractUnitTestCase
+{
 
     /** @var \A7\CacheInterface */
     protected $cache;

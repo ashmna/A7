@@ -4,6 +4,7 @@ namespace A7\Tests\Resources;
 
 abstract class AbstractUnitTestCase extends \PHPUnit_Framework_TestCase
 {
+
     protected function setMock($class, $memberName, $mock)
     {
         $reflection = new \ReflectionClass(get_class($class));
@@ -27,4 +28,5 @@ abstract class AbstractUnitTestCase extends \PHPUnit_Framework_TestCase
         $member->setAccessible(true);
         return $member->getValue($class);
     }
+
 }
