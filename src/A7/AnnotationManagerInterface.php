@@ -14,6 +14,4 @@ interface AnnotationManagerInterface
     function getMethodsAnnotations($className);
     function getMethodAnnotations($className, $methodName);
     function getMethodAnnotation($className, $methodName, $annotationName);
-
-    function scan($directory);
 }

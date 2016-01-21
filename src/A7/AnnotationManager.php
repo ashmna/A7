@@ -9,6 +9,7 @@ use Doctrine\Common\Annotations\SimpleAnnotationReader;
 
 class AnnotationManager implements AnnotationManagerInterface
 {
+
     private $annotationReader;
     /** @var CacheInterface  */
     private $cache;
@@ -89,11 +90,6 @@ class AnnotationManager implements AnnotationManagerInterface
     {
         $methodAnnotations = $this->getMethodAnnotations($className, $methodName);
         return isset($methodAnnotations[$annotationName]) ? $methodAnnotations[$annotationName] : null;
-    }
-
-    public function scan($directory)
-    {
-        // TODO: Implement scan() method.
     }
 
     private function inCache($key)

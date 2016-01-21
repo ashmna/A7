@@ -7,7 +7,8 @@ namespace A7\PostProcessors;
 use A7\PostProcessInterface;
 use A7\Proxy;
 
-class Logger implements PostProcessInterface {
+class Logger implements PostProcessInterface
+{
 
     private $a7;
     private $parameters;
@@ -75,6 +76,5 @@ class Logger implements PostProcessInterface {
     function exceptionHandling($className, $methodName, $exception) {
         $this->log->error("$className->$methodName", $exception);
     }
-
 
 }

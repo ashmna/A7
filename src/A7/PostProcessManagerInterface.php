@@ -3,7 +3,6 @@
 
 namespace A7;
 
-
 interface PostProcessManagerInterface
 {
     function __construct(A7Interface $a7, AnnotationManagerInterface $annotationManager);

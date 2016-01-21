@@ -3,8 +3,8 @@
 
 namespace A7;
 
-
-class Proxy {
+class Proxy
+{
 
     /** @var A7Interface */
     protected $a7;
@@ -128,6 +128,7 @@ class Proxy {
         $this->a7Init();
         return method_exists($this->a7Instance, $methodName);
     }
+
     public function a7getClass()
     {
         return $this->a7ClassName;

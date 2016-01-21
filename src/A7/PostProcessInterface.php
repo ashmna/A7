@@ -3,7 +3,6 @@
 
 namespace A7;
 
-
 interface PostProcessInterface
 {
     function postProcessBeforeInitialization($instance, $className);

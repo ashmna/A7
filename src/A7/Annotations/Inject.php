@@ -11,6 +11,7 @@ namespace A7\Annotations;
  */
 final class Inject
 {
+
     private $name;
     private $parameters = [];
 

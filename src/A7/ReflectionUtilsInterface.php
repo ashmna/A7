@@ -3,7 +3,8 @@
 namespace A7;
 
 
-interface ReflectionUtilsInterface {
+interface ReflectionUtilsInterface
+{
     /**
      * @param $className
      * @return \ReflectionClass

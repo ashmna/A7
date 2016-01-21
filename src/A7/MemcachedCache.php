@@ -40,5 +40,4 @@ class MemcachedCache implements CacheInterface
         // TODO: Implement clear() method.
     }
 
-
 }
