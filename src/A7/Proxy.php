@@ -136,7 +136,9 @@ class Proxy
 
     protected function a7Init()
     {
-        if(!isset($this->a7Instance)) $this->a7Instance = $this->a7->initClass($this->a7ClassName, true);
+        if(!isset($this->a7Instance)) {
+            $this->a7Instance = $this->a7->initClass($this->a7ClassName, true);
+        }
         $this->a7DoPostProcessors();
     }
 
