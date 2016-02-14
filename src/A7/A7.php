@@ -55,17 +55,21 @@ class A7 implements A7Interface
             }
             return $object;
         } else {
-            throw new \Exception($class.' class not found');
+            throw new \Exception($class." class not found");
         }
     }
 
-    public function call($class, $method, array $arguments)
+    public function call($object, $method, array $arguments)
     {
-        if(!is_object($class)) {
-            $class = $this->get($class);
+        if(!is_object($object)) {
+            $object = $this->get($object);
         }
         $callParams = [];
-        $className = $class instanceof Proxy ? $class->a7getClass() : get_class($class);
+        if ($object instanceof Proxy) {
+            $className = $object->a7getClass();
+        } else {
+            $className = get_class($object);
+        }
         foreach(ReflectionUtils::getInstance()->getParametersReflection($className, $method) as $parameter) {
             $parameterName = $parameter->getName();
             if(array_key_exists($parameterName, $arguments)) {
@@ -83,7 +87,7 @@ class A7 implements A7Interface
                 $callParams[] = $val;
             }
         }
-        return call_user_func_array([$class, $method], $callParams);
+        return call_user_func_array([$object, $method], $callParams);
     }
 
     public function enablePostProcessor($postProcessor, array $parameters = [])
@@ -103,15 +107,16 @@ class A7 implements A7Interface
         if ($instanceOnly) {
             $instance = new $class();
         } else {
-            $instance = $this->isLazy($class) ? new Proxy($this, $class) : new $class();
+            if ($this->isLazy($class)) {
+                $instance = new Proxy($this, $class);
+                $instanceOnly = true;
+            } else {
+                $instance = new $class();
+            }
         }
 
         if(!$instanceOnly) {
             $instance = $this->doPostProcessors($instance, $class, $this->postProcessors);
-        }
-
-        if($instanceOnly && $this->isSingleton($class)) {
-            $this->singletonList[$class] = $instance;
         }
 
         return $instance;
@@ -133,7 +138,7 @@ class A7 implements A7Interface
         $className = get_class($instance);
         $methodsAnnotations = $this->annotationManager->getMethodsAnnotations($className);
         foreach($methodsAnnotations as $method => $annotations) {
-            if(isset($annotations['Init'])) {
+            if(isset($annotations["Init"])) {
                 $methodReflection = ReflectionUtils::getInstance()->getMethodReflection($className, $method);
                 $methodReflection->setAccessible(true);
                 $methodReflection->invoke($instance);
@@ -151,24 +156,24 @@ class A7 implements A7Interface
         return $instance;
     }
 
-    public static function methodExists($class, $methodName) {
-        if($class instanceof Proxy) {
-            return $class->a7methodExists($methodName);
+    public static function methodExists($object, $methodName) {
+        if($object instanceof Proxy) {
+            return $object->a7methodExists($methodName);
         } else {
-            return method_exists($class, $methodName);
+            return method_exists($object, $methodName);
         }
     }
 
     protected function getRealClassName($class)
     {
-        $arr = explode('\\', trim($class, '\\'));
+        $arr = explode("\\", trim($class, "\\"));
         $name = $arr[count($arr)-1];
-        $class = implode($arr, '\\');
+        $class = implode($arr, "\\");
         if(!class_exists($class)) {
             $class = $name;
             array_pop($arr);
             if(!empty($arr)) {
-                $namespace = implode($arr, '\\');
+                $namespace = implode($arr, "\\");
                 $newClassName = $namespace."\\Impl\\".$name."Impl";
                 if(class_exists($newClassName)) {
                     $class = $newClassName;
@@ -190,18 +195,19 @@ class A7 implements A7Interface
 
     protected function isSingleton($class)
     {
-        $injectable = $this->annotationManager->getClassAnnotation($class, 'Injectable');
-        /** @var Injectable $injectable */
-        $injectable = !isset($injectable) ? new Injectable() : $injectable;
-
+        $injectable = $this->annotationManager->getClassAnnotation($class, "Injectable");
+        if (!isset($injectable)) {
+            $injectable = new Injectable();
+        }
         return $injectable->isSingleton();
     }
 
     protected function isLazy($class)
     {
-        $injectable = $this->annotationManager->getClassAnnotation($class, 'Injectable');
-        /** @var Injectable $injectable */
-        $injectable = !isset($injectable) ? new Injectable() : $injectable;
+        $injectable = $this->annotationManager->getClassAnnotation($class, "Injectable");
+        if (!isset($injectable)) {
+            $injectable = new Injectable();
+        }
         return $injectable->lazy;
     }
 
