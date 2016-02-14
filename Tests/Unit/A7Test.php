@@ -10,6 +10,7 @@ use A7\A7;
 use A7\Annotations\Init;
 use A7\Annotations\Injectable;
 use A7\PostProcessors\SomePostProcess;
+use A7\Proxy;
 use A7\Tests\Resources\AbstractUnitTestCase;
 use A7\Tests\Resources\EmptyClass8;
 use A7\Tests\Resources\Impl\EmptyClass1Impl;
@@ -243,6 +244,7 @@ class A7Test extends AbstractUnitTestCase
         $className = 'A7\Tests\Resources\EmptyClass8';
         $injectable = new Injectable();
         $injectable->lazy = false;
+        $proxy = new Proxy($this->a7, $className);
         $arguments = [
             'key'  => 'value',
             'key1' => 'value1',
@@ -277,6 +279,8 @@ class A7Test extends AbstractUnitTestCase
         $this->assertEquals([], $res);
         $res = $this->a7->call(new EmptyClass8(), 'methodReturnTrue', []);
         $this->assertTrue($res);
+        $res = $this->a7->call($proxy, 'returnAgr', $arguments);
+        $this->assertEquals('value', $res);
     }
 
     public function testEnableAndDisablePostProcessor()
@@ -306,6 +310,41 @@ class A7Test extends AbstractUnitTestCase
         $class = 'A7\Tests\Resources\Impl\EmptyClass1Impl';
         $instanceOnly = true;
         $injectable = new Injectable();
+        // Run Test
+        $object = $this->a7->initClass($class, $instanceOnly);
+        $this->assertInstanceOf($class, $object);
+    }
+
+    public function testInitClassWithoutInstanceOnly()
+    {
+        // Test Data
+        $class = 'A7\Tests\Resources\Impl\EmptyClass1Impl';
+        $instanceOnly = false;
+        $injectable = new Injectable();
+        $injectable->lazy = false;
+        // Expectations
+        $this->annotationManager
+            ->expects($this->once())
+            ->method("getClassAnnotation")
+            ->with($class, "Injectable")
+            ->willReturn($injectable);
+        $this->annotationManager
+            ->expects($this->once())
+            ->method("getMethodsAnnotations")
+            ->with($class)
+            ->willReturn([]);
+        // Run Test
+        $object = $this->a7->initClass($class, $instanceOnly);
+        $this->assertInstanceOf($class, $object);
+    }
+
+    public function testInitClassWithProxy()
+    {
+        // Test Data
+        $class = 'A7\Tests\Resources\Impl\EmptyClass1Impl';
+        $instanceOnly = false;
+        $injectable = new Injectable();
+        $injectable->lazy = true;
         // Expectations
         $this->annotationManager
             ->expects($this->once())
@@ -314,12 +353,11 @@ class A7Test extends AbstractUnitTestCase
             ->willReturn($injectable);
         // Run Test
         $object = $this->a7->initClass($class, $instanceOnly);
-        $this->assertInstanceOf($class, $object);
+        $this->assertInstanceOf("A7\\Proxy", $object);
     }
 
     public function testDoPostProcessors()
     {
-        //$instance, $class, array $postProcessors, $proxyInstance = null
         // Test Data
         $class = 'A7\Tests\Resources\Impl\EmptyClass1Impl';
         $instance = new EmptyClass1Impl();
@@ -335,6 +373,138 @@ class A7Test extends AbstractUnitTestCase
         $this->assertInstanceOf($class, $object);
     }
 
+    public function testDoPostProcessorsWithProcessors()
+    {
+        // Test Data
+        $postProcess = 'SomePostProcess';
+        $postProcessInstance = new SomePostProcess();
+        SomePostProcess::$counter = 0;
+        $class = 'A7\Tests\Resources\Impl\EmptyClass1Impl';
+        $instance = new EmptyClass1Impl();
+        $postProcessors = [
+            $postProcess => $postProcessInstance
+        ];
+        // Expectations
+        $this->annotationManager
+            ->expects($this->once())
+            ->method("getMethodsAnnotations")
+            ->with($class)
+            ->willReturn([]);
+        // Run Test
+        $object = $this->a7->doPostProcessors($instance, $class, $postProcessors);
+        $this->assertInstanceOf($class, $object);
+        $this->assertEquals(2, SomePostProcess::$counter);
+    }
 
+    public function testDoPostProcessorsWithProcessorsAndProxy()
+    {
+        // Test Data
+        $postProcess = 'SomePostProcess';
+        $postProcessInstance = new SomePostProcess();
+        SomePostProcess::$counter = 0;
+        $class = 'A7\Tests\Resources\Impl\EmptyClass1Impl';
+        $instance = new EmptyClass1Impl();
+        $proxy = new Proxy($this->a7, $class, $instance);
+        $postProcessors = [
+            $postProcess => $postProcessInstance
+        ];
+        // Expectations
+        $this->annotationManager
+            ->expects($this->once())
+            ->method("getMethodsAnnotations")
+            ->with($class)
+            ->willReturn([]);
+        // Run Test
+        $object = $this->a7->doPostProcessors($instance, $class, $postProcessors, $proxy);
+        $this->assertInstanceOf($class, $object);
+        $this->assertEquals(2, SomePostProcess::$counter);
+    }
+
+    public function testIsSingletonWithInjectableAnnotation()
+    {
+        // Test Data
+        $className = "SomeClass";
+        $injectable = new Injectable();
+        // Expectations
+        $this->annotationManager
+            ->expects($this->once())
+            ->method("getClassAnnotation")
+            ->with($className, "Injectable")
+            ->willReturn($injectable);
+        // Run Test
+        $result = $this->invokeMethod($this->a7, "isSingleton", [$className]);
+        $this->assertTrue($result);
+    }
+
+    public function testIsSingletonWithoutInjectableAnnotation()
+    {
+        // Test Data
+        $className = "SomeClass";
+        // Expectations
+        $this->annotationManager
+            ->expects($this->once())
+            ->method("getClassAnnotation")
+            ->with($className, "Injectable")
+            ->willReturn(null);
+        // Run Test
+        $result = $this->invokeMethod($this->a7, "isSingleton", [$className]);
+        $this->assertTrue($result);
+    }
+
+    public function testIsLazyWithInjectableAnnotation()
+    {
+        // Test Data
+        $className = "SomeClass";
+        $injectable = new Injectable();
+        // Expectations
+        $this->annotationManager
+            ->expects($this->once())
+            ->method("getClassAnnotation")
+            ->with($className, "Injectable")
+            ->willReturn($injectable);
+        // Run Test
+        $result = $this->invokeMethod($this->a7, "isLazy", [$className]);
+        $this->assertTrue($result);
+    }
+
+    public function testIsLazyWithoutInjectableAnnotation()
+    {
+        // Test Data
+        $className = "SomeClass";
+        // Expectations
+        $this->annotationManager
+            ->expects($this->once())
+            ->method("getClassAnnotation")
+            ->with($className, "Injectable")
+            ->willReturn(null);
+        // Run Test
+        $result = $this->invokeMethod($this->a7, "isLazy", [$className]);
+        $this->assertTrue($result);
+    }
+
+    public function testGetCache()
+    {
+        // Run Test
+        $cache = A7::getCache();
+        $this->assertEquals($cache, $this->cache);
+    }
+
+    public function testMethodExists()
+    {
+        // Test data
+        $object = new \EmptyClass6();
+        // Run test
+        $result = A7::methodExists($object, "someMethod");
+        $this->assertTrue($result);
+    }
+
+    public function testMethodExistsWithProxy()
+    {
+        // Test data
+        $proxy = new Proxy($this->a7, "EmptyClass6");
+        // Run test
+        $result = A7::methodExists($proxy, "someMethod");
+        $this->assertTrue($result);
+    }
 
 }
