@@ -77,10 +77,21 @@ Vagrant.configure(2) do |config|
     sudo apt-get install -y php5-cli
     sudo apt-get install -y php5-dev php-pear
     sudo pecl install -Z xdebug
-    # sudo 'zend_extension="/usr/lib/php5/20121212/xdebug.so"' >> /etc/php5/fpm/php.ini
+    sudo touch /etc/php5/cli/conf.d/xdebug.ini
+    sudo echo "[Xdebug]" >> /etc/php5/cli/conf.d/xdebug.ini
+    sudo echo "zend_extension=\"/usr/lib/php5/20121212+lfs/xdebug.so\"" >> /etc/php5/cli/conf.d/xdebug.ini
+    sudo echo "xdebug.remote_enable=on" >> /etc/php5/cli/conf.d/xdebug.ini
+    sudo echo "xdebug.remote_connect_back=on" >> /etc/php5/cli/conf.d/xdebug.ini
+    sudo echo "xdebug.extended_info=1" >> /etc/php5/cli/conf.d/xdebug.ini
+    sudo touch /etc/php5/fpm/conf.d/xdebug.ini
+    sudo echo "[Xdebug]" >> /etc/php5/fpm/conf.d/xdebug.ini
+    sudo echo "zend_extension=\"/usr/lib/php5/20121212+lfs/xdebug.so\"" >> /etc/php5/fpm/conf.d/xdebug.ini
+    sudo echo "xdebug.remote_enable=on" >> /etc/php5/fpm/conf.d/xdebug.ini
+    sudo echo "xdebug.remote_connect_back=on" >> /etc/php5/fpm/conf.d/xdebug.ini
+    sudo echo "xdebug.extended_info=1" >> /etc/php5/fpm/conf.d/xdebug.ini
     sudo service php5-fpm restart
   SHELL
-  # sudo nano /etc/php5/cli/conf.d/xdebug.ini
+  # vagrant up --provision
   # sudo nano /etc/php5/fpm/conf.d/xdebug.ini
   # [Xdebug]
   # zend_extension="/usr/lib/php5/20121212+lfs/xdebug.so"
