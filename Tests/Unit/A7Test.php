@@ -33,9 +33,9 @@ class A7Test extends AbstractUnitTestCase
         // Init test class
         $this->a7 = new A7();
         // Init mocks
-        $this->cache = $this->getMockBuilder('\A7\ArrayCache')->getMock();
-        $this->annotationManager = $this->getMockBuilder('\A7\AnnotationManager')->getMock();
-        $this->postProcessManager = $this->getMockBuilder('\A7\PostProcessManager')
+        $this->cache = $this->getMockBuilder("\\A7\\ArrayCache")->getMock();
+        $this->annotationManager = $this->getMockBuilder("\\A7\\AnnotationManager")->getMock();
+        $this->postProcessManager = $this->getMockBuilder("\\A7\\PostProcessManager")
             ->setConstructorArgs([$this->a7, $this->annotationManager])->getMock();
         // Set mocks
         $this->setMock($this->a7, "cache", $this->cache);
@@ -56,8 +56,8 @@ class A7Test extends AbstractUnitTestCase
     public function testGetWithInterfaceImplFolderImpl()
     {
         // Test data
-        $interfaceName = 'A7\Tests\Resources\EmptyClass1';
-        $objectInstance = 'A7\Tests\Resources\Impl\EmptyClass1Impl';
+        $interfaceName = "A7\\Tests\\Resources\\EmptyClass1";
+        $objectInstance = "A7\\Tests\\Resources\\Impl\\EmptyClass1Impl";
         $injectable = new Injectable();
         $injectable->lazy = false;
         // Expectations
@@ -79,8 +79,8 @@ class A7Test extends AbstractUnitTestCase
     public function testGetWithInterfaceImplFolder()
     {
         // Test data
-        $interfaceName = 'A7\Tests\Resources\EmptyClass2';
-        $objectInstance = 'A7\Tests\Resources\Impl\EmptyClass2';
+        $interfaceName = "A7\\Tests\\Resources\\EmptyClass2";
+        $objectInstance = "A7\\Tests\\Resources\\Impl\\EmptyClass2";
         $injectable = new Injectable();
         $injectable->lazy = false;
         // Expectations
@@ -102,8 +102,8 @@ class A7Test extends AbstractUnitTestCase
     public function testGetWithInterfaceImpl()
     {
         // Test data
-        $interfaceName = 'A7\Tests\Resources\EmptyClass3';
-        $objectInstance = 'A7\Tests\Resources\EmptyClass3Impl';
+        $interfaceName = "A7\\Tests\\Resources\\EmptyClass3";
+        $objectInstance = "A7\\Tests\\Resources\\EmptyClass3Impl";
         $injectable = new Injectable();
         $injectable->lazy = false;
         // Expectations
@@ -125,7 +125,7 @@ class A7Test extends AbstractUnitTestCase
     public function testGetWithClassName()
     {
         // Test data
-        $className = 'A7\Tests\Resources\EmptyClass4';
+        $className = "A7\\Tests\\Resources\\EmptyClass4";
         $injectable = new Injectable();
         $injectable->lazy = false;
         // Expectations
@@ -147,7 +147,7 @@ class A7Test extends AbstractUnitTestCase
     public function testGetForInitMethod()
     {
         // Test data
-        $className = 'A7\Tests\Resources\EmptyClass5';
+        $className = "A7\\Tests\\Resources\\EmptyClass5";
         $injectable = new Injectable();
         $injectable->lazy = false;
         // Expectations
@@ -161,12 +161,12 @@ class A7Test extends AbstractUnitTestCase
             ->method("getMethodsAnnotations")
             ->with($className)
             ->willReturn([
-                'emptyMethod1' => [],
-                'emptyMethod2' => [],
-                'emptyMethod3' => [],
-                'emptyMethod4' => ['Init' => new Init()],
-                'emptyMethod5' => ['Init' => new Init()],
-                'emptyMethod6' => ['Init' => new Init()],
+                "emptyMethod1" => [],
+                "emptyMethod2" => [],
+                "emptyMethod3" => [],
+                "emptyMethod4" => ["Init" => new Init()],
+                "emptyMethod5" => ["Init" => new Init()],
+                "emptyMethod6" => ["Init" => new Init()],
             ]);
         // Run Test
         $object = $this->a7->get($className);
@@ -177,7 +177,7 @@ class A7Test extends AbstractUnitTestCase
     public function testGetWithNoneNamespace()
     {
         // Test data
-        $className = 'EmptyClass6';
+        $className = "EmptyClass6";
         $injectable = new Injectable();
         $injectable->lazy = false;
         // Expectations
@@ -202,13 +202,13 @@ class A7Test extends AbstractUnitTestCase
     public function testGetWithException()
     {
         // Test data
-        $className = 'EmptyClass';
+        $className = "EmptyClass";
         // Run Test
         try {
             $this->a7->get($className);
         } catch (\Exception $e) {
-            $this->assertInstanceOf('\Exception', $e);
-            $this->assertEquals('EmptyClass class not found', $e->getMessage());
+            $this->assertInstanceOf("\\Exception", $e);
+            $this->assertEquals("EmptyClass class not found", $e->getMessage());
             throw $e;
         }
     }
@@ -216,7 +216,7 @@ class A7Test extends AbstractUnitTestCase
     public function testGetWithSingletonList()
     {
         // Test data
-        $className = 'A7\Tests\Resources\EmptyClass7';
+        $className = "A7\\Tests\\Resources\\EmptyClass7";
         $injectable = new Injectable();
         $injectable->lazy = false;
         // Expectations
@@ -241,15 +241,15 @@ class A7Test extends AbstractUnitTestCase
     public function testCall()
     {
         // Test Data
-        $className = 'A7\Tests\Resources\EmptyClass8';
+        $className = "A7\\Tests\\Resources\\EmptyClass8";
         $injectable = new Injectable();
         $injectable->lazy = false;
         $proxy = new Proxy($this->a7, $className);
         $arguments = [
-            'key'  => 'value',
-            'key1' => 'value1',
-            'key2' => 'value2',
-            'key3' => 'value3',
+            "key"  => "value",
+            "key1" => "value1",
+            "key2" => "value2",
+            "key3" => "value3",
         ];
         // Expectations
         $this->annotationManager
@@ -263,53 +263,52 @@ class A7Test extends AbstractUnitTestCase
             ->with($className)
             ->willReturn([]);
         // Run Test
-        $res = $this->a7->call($className, 'methodReturnTrue', []);
+        $res = $this->a7->call($className, "methodReturnTrue", []);
         $this->assertTrue($res);
-        $res = $this->a7->call($className, 'methodReturnTrue', $arguments);
+        $res = $this->a7->call($className, "methodReturnTrue", $arguments);
         $this->assertTrue($res);
-        $res = $this->a7->call($className, 'returnArguments', $arguments);
+        $res = $this->a7->call($className, "returnArguments", $arguments);
         $this->assertEquals([], $res);
-        $res = $this->a7->call($className, 'returnAgr', $arguments);
-        $this->assertEquals('value', $res);
-        $res = $this->a7->call($className, 'returnAgrArray', $arguments);
-        $this->assertEquals(['value'], $res);
-        $res = $this->a7->call($className, 'returnAgrDefaultValue', []);
+        $res = $this->a7->call($className, "returnAgr", $arguments);
+        $this->assertEquals("value", $res);
+        $res = $this->a7->call($className, "returnAgrArray", $arguments);
+        $this->assertEquals(["value"], $res);
+        $res = $this->a7->call($className, "returnAgrDefaultValue", []);
         $this->assertEquals(10, $res);
-        $res = $this->a7->call($className, 'returnAgrDefaultValueArray', []);
+        $res = $this->a7->call($className, "returnAgrDefaultValueArray", []);
         $this->assertEquals([], $res);
-        $res = $this->a7->call(new EmptyClass8(), 'methodReturnTrue', []);
+        $res = $this->a7->call(new EmptyClass8(), "methodReturnTrue", []);
         $this->assertTrue($res);
-        $res = $this->a7->call($proxy, 'returnAgr', $arguments);
-        $this->assertEquals('value', $res);
+        $res = $this->a7->call($proxy, "returnAgr", $arguments);
+        $this->assertEquals("value", $res);
     }
 
     public function testEnableAndDisablePostProcessor()
     {
         // Test Data
-        $postProcess = 'SomePostProcess';
+        $postProcess = "SomePostProcess";
         $postProcessInstance = new SomePostProcess();
         $parameters = [];
         // Expectations
         $this->postProcessManager
             ->expects($this->once())
-            ->method('getPostProcessInstance')
+            ->method("getPostProcessInstance")
             ->with($postProcess, $parameters)
             ->willReturn($postProcessInstance);
         // Run Test
         $this->a7->enablePostProcessor($postProcess);
-        $postProcessors = $this->getMember($this->a7, 'postProcessors');
+        $postProcessors = $this->getMember($this->a7, "postProcessors");
         $this->assertEquals([$postProcess => $postProcessInstance], $postProcessors);
         $this->a7->disablePostProcessor($postProcess);
-        $postProcessors = $this->getMember($this->a7, 'postProcessors');
+        $postProcessors = $this->getMember($this->a7, "postProcessors");
         $this->assertEquals([], $postProcessors);
     }
 
     public function testInitClassWithInstanceOnly()
     {
         // Test Data
-        $class = 'A7\Tests\Resources\Impl\EmptyClass1Impl';
+        $class = "A7\\Tests\\Resources\\Impl\\EmptyClass1Impl";
         $instanceOnly = true;
-        $injectable = new Injectable();
         // Run Test
         $object = $this->a7->initClass($class, $instanceOnly);
         $this->assertInstanceOf($class, $object);
@@ -318,7 +317,7 @@ class A7Test extends AbstractUnitTestCase
     public function testInitClassWithoutInstanceOnly()
     {
         // Test Data
-        $class = 'A7\Tests\Resources\Impl\EmptyClass1Impl';
+        $class = "A7\\Tests\\Resources\\Impl\\EmptyClass1Impl";
         $instanceOnly = false;
         $injectable = new Injectable();
         $injectable->lazy = false;
@@ -341,7 +340,7 @@ class A7Test extends AbstractUnitTestCase
     public function testInitClassWithProxy()
     {
         // Test Data
-        $class = 'A7\Tests\Resources\Impl\EmptyClass1Impl';
+        $class = "A7\\Tests\\Resources\\Impl\\EmptyClass1Impl";
         $instanceOnly = false;
         $injectable = new Injectable();
         $injectable->lazy = true;
@@ -359,7 +358,7 @@ class A7Test extends AbstractUnitTestCase
     public function testDoPostProcessors()
     {
         // Test Data
-        $class = 'A7\Tests\Resources\Impl\EmptyClass1Impl';
+        $class = "A7\\Tests\\Resources\\Impl\\EmptyClass1Impl";
         $instance = new EmptyClass1Impl();
         $postProcessors = [];
         // Expectations
@@ -376,10 +375,10 @@ class A7Test extends AbstractUnitTestCase
     public function testDoPostProcessorsWithProcessors()
     {
         // Test Data
-        $postProcess = 'SomePostProcess';
+        $postProcess = "SomePostProcess";
         $postProcessInstance = new SomePostProcess();
         SomePostProcess::$counter = 0;
-        $class = 'A7\Tests\Resources\Impl\EmptyClass1Impl';
+        $class = "A7\\Tests\\Resources\\Impl\\EmptyClass1Impl";
         $instance = new EmptyClass1Impl();
         $postProcessors = [
             $postProcess => $postProcessInstance
@@ -399,10 +398,10 @@ class A7Test extends AbstractUnitTestCase
     public function testDoPostProcessorsWithProcessorsAndProxy()
     {
         // Test Data
-        $postProcess = 'SomePostProcess';
+        $postProcess = "SomePostProcess";
         $postProcessInstance = new SomePostProcess();
         SomePostProcess::$counter = 0;
-        $class = 'A7\Tests\Resources\Impl\EmptyClass1Impl';
+        $class = "A7\\Tests\\Resources\\Impl\\EmptyClass1Impl";
         $instance = new EmptyClass1Impl();
         $proxy = new Proxy($this->a7, $class, $instance);
         $postProcessors = [
