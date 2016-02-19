@@ -4,7 +4,7 @@
   "minimum-stability": "dev",
   "autoload" : {
     "psr-4": {
-      "A7\\" : "src/A7",
+      "A7\\" : "src",
       "A7\\Tests\\" : "Tests"
     }
   },
