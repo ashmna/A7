@@ -71,7 +71,7 @@ class A7 implements A7Interface
             $className = get_class($object);
         }
         foreach(ReflectionUtils::getInstance()->getParametersReflection($className, $method) as $parameter) {
-            $parameterName = $parameter->getName();
+            $parameterName = $parameter->name;
             if(array_key_exists($parameterName, $arguments)) {
                 if($parameter->isArray()) {
                     $arguments[$parameterName] = (array)$arguments[$parameterName];
@@ -193,22 +193,23 @@ class A7 implements A7Interface
         return $class;
     }
 
-    protected function isSingleton($class)
+    protected function getInjectableAnnotation($class)
     {
         $injectable = $this->annotationManager->getClassAnnotation($class, "Injectable");
         if (!isset($injectable)) {
             $injectable = new Injectable();
         }
-        return $injectable->isSingleton();
+        return $injectable;
+    }
+
+    protected function isSingleton($class)
+    {
+        return $this->getInjectableAnnotation($class)->isSingleton();
     }
 
     protected function isLazy($class)
     {
-        $injectable = $this->annotationManager->getClassAnnotation($class, "Injectable");
-        if (!isset($injectable)) {
-            $injectable = new Injectable();
-        }
-        return $injectable->lazy;
+        return $this->getInjectableAnnotation($class)->lazy;
     }
 
 }
