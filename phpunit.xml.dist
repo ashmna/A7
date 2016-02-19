@@ -19,7 +19,7 @@
 
     <filter>
         <whitelist>
-            <directory>./src/A7/</directory>
+            <directory>./src/</directory>
         </whitelist>
     </filter>
 </phpunit>
