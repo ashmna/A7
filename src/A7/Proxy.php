@@ -7,14 +7,14 @@ class Proxy
 {
 
     /** @var A7Interface */
-    protected $a7;
+    private $a7;
     /** @var PostProcessInterface[] */
-    protected $a7PostProcessors = [];
-    protected $a7Instance;
-    protected $a7ClassName;
-    protected $a7BeforeCall = [];
-    protected $a7AfterCall  = [];
-    protected $a7ExceptionHandling = [];
+    private $a7PostProcessors = [];
+    private $a7Instance;
+    private $a7ClassName;
+    private $a7BeforeCall = [];
+    private $a7AfterCall  = [];
+    private $a7ExceptionHandling = [];
 
 
     public function __construct(A7Interface $a7, $className, $instance = null)
@@ -134,7 +134,7 @@ class Proxy
         return $this->a7ClassName;
     }
 
-    protected function a7Init()
+    private function a7Init()
     {
         if(!isset($this->a7Instance)) {
             $this->a7Instance = $this->a7->initClass($this->a7ClassName, true);
@@ -142,10 +142,10 @@ class Proxy
         $this->a7DoPostProcessors();
     }
 
-    protected function a7Call(array $callArr, array $params=[])
+    private function a7Call(array $callArr, array $params=[])
     {
-        list($afterCallClass, $afterCallMethodName) = $callArr;
-        $this->a7->call($afterCallClass, $afterCallMethodName, $params);
+        list($callClass, $callMethodName) = $callArr;
+        $this->a7->call($callClass, $callMethodName, $params);
     }
 
 }
