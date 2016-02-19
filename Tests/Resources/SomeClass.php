@@ -6,17 +6,19 @@ namespace A7\Tests\Resources;
 class SomeClass
 {
 
-    private $a;
+    public $a;
     private $b;
+    protected $c;
 
-    public function someMethod($a, $b)
+    public function someMethod($a, $b, $c)
     {
         $this->a = $a;
         $this->b = $b;
+        $this->c = $c;
     }
 
-    public function someMethode2($a)
+    public function someMethod2($d)
     {
-        return $a;
+        return $d;
     }
 }
