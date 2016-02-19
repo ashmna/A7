@@ -19,12 +19,11 @@ class ProxyTest extends AbstractUnitTestCase
     // Mocks
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $a7;
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $someClassName = "A7\\Tests\\Resources\\SomeClass";
 
     public function setUp()
     {
-        $this->a7 = $this->getMockBuilder('\A7\A7')->getMock();
+        $this->a7 = $this->getMockBuilder("\\A7\\A7")->getMock();
         /** @noinspection PhpParamsInspection */
         $this->proxy = new Proxy($this->a7, $this->someClassName);
     }
@@ -91,9 +90,61 @@ class ProxyTest extends AbstractUnitTestCase
         $this->invokeMethod($this->proxy, "a7Call", [["class", "method"], ["arg1", 2, []]]);
     }
 
+    public function testGetMethod()
+    {
+        // Test Data
+        $instance = new SomeClass();
+        $instance->someMethod(10, 20, 30);
+        /** @noinspection PhpParamsInspection */
+        $this->proxy = new Proxy($this->a7, $this->someClassName, $instance);
+        // Run Test
+        $this->assertEquals(10, $this->proxy->a);
+    }
 
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testGetMethodWithException()
+    {
+        // Test Data
+        /** @noinspection PhpParamsInspection */
+        $this->proxy = new Proxy($this->a7, $this->someClassName, new SomeClass());
+        // Run Test
+        try {
+            $d = $this->proxy->d;
+        } catch (\RuntimeException $e) {
+            $this->assertInstanceOf("\\RuntimeException", $e);
+            $this->assertEquals("A7\\Tests\\Resources\\SomeClass::\$d [get] property not exists", $e->getMessage());
+            throw $e;
+        }
+    }
 
+    public function testSetMethod()
+    {
+        // Test Data
+        /** @noinspection PhpParamsInspection */
+        $this->proxy = new Proxy($this->a7, $this->someClassName, new SomeClass);
+        // Run Test
+        $this->proxy->a = 2345;
+        $this->assertEquals(2345, $this->proxy->a);
+    }
 
-
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testSetMethodWithException()
+    {
+        // Test Data
+        /** @noinspection PhpParamsInspection */
+        $this->proxy = new Proxy($this->a7, $this->someClassName, new SomeClass());
+        // Run Test
+        try {
+            $this->proxy->d = 6789;
+        } catch (\RuntimeException $e) {
+            $this->assertInstanceOf("\\RuntimeException", $e);
+            $this->assertEquals("A7\\Tests\\Resources\\SomeClass::\$d [set] property not exists", $e->getMessage());
+            throw $e;
+        }
+    }
 
 }
