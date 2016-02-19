@@ -8,7 +8,8 @@ use A7\ArrayCache;
 class ArrayCacheTest extends AbstractCacheTest
 {
 
-    public function setUp() {
+    public function setUp()
+    {
         $this->cache = new ArrayCache();
     }
 
