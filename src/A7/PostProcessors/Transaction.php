@@ -35,7 +35,8 @@ class Transaction implements PostProcessInterface
     private $rollback;
 
 
-    private function init() {
+    private function init()
+    {
         if(!$this->isInit) {
             $this->isInit = true;
             $this->DBInstance = null;
@@ -56,11 +57,11 @@ class Transaction implements PostProcessInterface
     {
         $this->init();
 
-
         return $instance;
     }
 
-    public function postProcessAfterInitialization($instance, $className) {
+    public function postProcessAfterInitialization($instance, $className)
+    {
         /** @var \A7\Annotations\Transactional $transactional */
         $transactional = $this->annotationManager->getClassAnnotation($className, 'Transactional');
         if(isset($transactional) && $transactional->isEnabled()) {
@@ -79,7 +80,8 @@ class Transaction implements PostProcessInterface
     }
 
 
-    public function beginTransaction($className, $methodName) {
+    public function beginTransaction($className, $methodName)
+    {
         /** @var \A7\Annotations\Transactional $transactional */
         $transactional = $this->annotationManager->getMethodAnnotation($className, $methodName, 'Transactional');
         if(!isset($transactional) || $transactional->isEnabled()) {
@@ -89,7 +91,8 @@ class Transaction implements PostProcessInterface
         }
     }
 
-    public function commit($className, $methodName) {
+    public function commit($className, $methodName)
+    {
         /** @var \A7\Annotations\Transactional $transactional */
         $transactional = $this->annotationManager->getMethodAnnotation($className, $methodName, 'Transactional');
         if(!isset($transactional) || $transactional->isEnabled()) {
@@ -99,7 +102,8 @@ class Transaction implements PostProcessInterface
         }
     }
 
-    public function rollback($className, $methodName) {
+    public function rollback($className, $methodName)
+    {
         /** @var \A7\Annotations\Transactional $transactional */
         $transactional = $this->annotationManager->getMethodAnnotation($className, $methodName, 'Transactional');
         if(!isset($transactional) || $transactional->isEnabled()) {

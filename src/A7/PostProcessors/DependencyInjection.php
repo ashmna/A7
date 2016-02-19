@@ -16,7 +16,7 @@ class DependencyInjection implements PostProcessInterface
     /** @var array */
     protected $parameters;
 
-    function postProcessBeforeInitialization($instance, $className)
+    public function postProcessBeforeInitialization($instance, $className)
     {
         if($instance instanceof Proxy) {
             $instance->a7AddPostProcessor($this);
@@ -27,12 +27,12 @@ class DependencyInjection implements PostProcessInterface
         return $instance;
     }
 
-    function postProcessAfterInitialization($instance, $className)
+    public function postProcessAfterInitialization($instance, $className)
     {
         return $instance;
     }
 
-    protected function doInjection($instance, $className)
+    private function doInjection($instance, $className)
     {
         $propertiesAnnotations = $this->annotationManager->getPropertiesAnnotations($className);
 

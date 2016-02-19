@@ -16,12 +16,12 @@ class Cache implements PostProcessInterface
 
 
     protected $cache = [];
-    function postProcessBeforeInitialization($instance, $className)
+    public function postProcessBeforeInitialization($instance, $className)
     {
         return $instance;
     }
 
-    function postProcessAfterInitialization($instance, $className)
+    public function postProcessAfterInitialization($instance, $className)
     {
         /** @var \A7\Annotations\Cache $cache */
         $cache = $this->annotationManager->getClassAnnotation($className, 'Cache');

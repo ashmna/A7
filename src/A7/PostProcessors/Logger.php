@@ -17,7 +17,7 @@ class Logger implements PostProcessInterface
     private $log;
 
 
-    function postProcessBeforeInitialization($instance, $className) {
+    public function postProcessBeforeInitialization($instance, $className) {
         if (!isset($this->log)) {
             if(isset($this->parameters['configure'])) {
                 \Logger::configure($this->parameters['configure']);
@@ -47,7 +47,7 @@ class Logger implements PostProcessInterface
         return $instance;
     }
 
-    function postProcessAfterInitialization($instance, $className) {
+    public function postProcessAfterInitialization($instance, $className) {
         if(!($instance instanceof Proxy)) {
             $instance = new Proxy($this->a7, $className, $instance);
         }
