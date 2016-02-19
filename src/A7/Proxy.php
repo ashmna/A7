@@ -33,13 +33,13 @@ class Proxy
             $result = null;
             $transferParams = [];
             $params = [
-                'object'     => &$this->a7Instance,
-                'className'  => &$this->a7ClassName,
-                'methodName' => &$methodName,
-                'arguments'  => &$arguments,
-                'result'     => &$result,
-                'params'     => &$transferParams,
-                'isCallable' => &$isCallable,
+                "object"     => &$this->a7Instance,
+                "className"  => &$this->a7ClassName,
+                "methodName" => &$methodName,
+                "arguments"  => &$arguments,
+                "result"     => &$result,
+                "params"     => &$transferParams,
+                "isCallable" => &$isCallable,
             ];
 
 
@@ -52,7 +52,7 @@ class Proxy
                     $result = call_user_func_array([$this->a7Instance, $methodName], $arguments);
                 }
             } catch(\Exception $exception) {
-                $params['exception'] = &$exception;
+                $params["exception"] = &$exception;
                 foreach($this->a7ExceptionHandling as $exceptionHandling) {
                     $this->a7Call($exceptionHandling, $params);
                 }
@@ -65,7 +65,7 @@ class Proxy
 
             return $result;
         } else {
-            throw new \RuntimeException($this->a7ClassName.'::'.$methodName.'() method not exists');
+            throw new \RuntimeException($this->a7ClassName."::".$methodName."() method not exists");
         }
     }
 
@@ -75,7 +75,7 @@ class Proxy
         if(property_exists($this->a7Instance, $name)) {
             return $this->a7Instance->{$name};
         } else {
-            throw new \RuntimeException($this->a7ClassName.'::$'.$name.' [get] property not exists');
+            throw new \RuntimeException($this->a7ClassName."::\${$name} [get] property not exists");
         }
     }
 
@@ -85,7 +85,7 @@ class Proxy
         if(property_exists($this->a7Instance, $name)) {
             $this->a7Instance->{$name} = $value;
         } else {
-            throw new \RuntimeException($this->a7ClassName.'::$'.$name.' [set] property not exists');
+            throw new \RuntimeException($this->a7ClassName."::\${$name} [set] property not exists");
         }
     }
 
