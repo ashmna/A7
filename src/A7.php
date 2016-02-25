@@ -10,17 +10,19 @@ class A7 implements A7Interface
 {
 
     /** @var PostProcessInterface[] */
-    protected $postProcessors = [];
+    private $postProcessors = [];
     /** @var array */
-    protected $singletonList  = [];
+    private $singletonList  = [];
     /** @var PostProcessManagerInterface */
-    protected $postProcessManager;
+    private $postProcessManager;
     /** @var AnnotationManagerInterface */
-    protected $annotationManager;
+    private $annotationManager;
     /** @var CacheInterface */
-    protected static $cache;
+    private static $cache;
 
     /**
+     * Get cache
+     *
      * @return CacheInterface
      */
     public static function getCache()
@@ -28,7 +30,11 @@ class A7 implements A7Interface
         return self::$cache;
     }
 
-
+    /**
+     * A7 constructor
+     *
+     * @param CacheInterface|null $cache
+     */
     public function __construct(CacheInterface $cache = null)
     {
         if(isset($cache)) {
@@ -40,6 +46,24 @@ class A7 implements A7Interface
         $this->postProcessManager = new PostProcessManager($this, $this->annotationManager);
     }
 
+    /**
+     * Checks if the class method exists
+     *
+     * @param object $object
+     * @param string $methodName
+     * @return bool
+     */
+    public static function methodExists($object, $methodName) {
+        if($object instanceof Proxy) {
+            return $object->a7methodExists($methodName);
+        } else {
+            return method_exists($object, $methodName);
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function get($class)
     {
         $class = $this->getRealClassName($class);
@@ -59,42 +83,34 @@ class A7 implements A7Interface
         }
     }
 
+    /**
+     * @inheritdoc
+     */
     public function call($object, $method, array $arguments)
     {
         if(!is_object($object)) {
             $object = $this->get($object);
         }
-        $callParams = [];
         if ($object instanceof Proxy) {
             $className = $object->a7getClass();
         } else {
             $className = get_class($object);
         }
-        foreach(ReflectionUtils::getInstance()->getParametersReflection($className, $method) as $parameter) {
-            $parameterName = $parameter->name;
-            if(array_key_exists($parameterName, $arguments)) {
-                if($parameter->isArray()) {
-                    $arguments[$parameterName] = (array)$arguments[$parameterName];
-                }
-                $callParams[] =& $arguments[$parameterName];
-            } else {
-                $val = null;
-                if($parameter->isDefaultValueAvailable()) {
-                    $val = $parameter->getDefaultValue();
-                } elseif($parameter->isArray()) {
-                    $val = [];
-                }
-                $callParams[] = $val;
-            }
-        }
+        $callParams = static::getCallParams($className, $method, $arguments);
         return call_user_func_array([$object, $method], $callParams);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function enablePostProcessor($postProcessor, array $parameters = [])
     {
         $this->postProcessors[$postProcessor] = $this->postProcessManager->getPostProcessInstance($postProcessor, $parameters);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function disablePostProcessor($postProcessor)
     {
         if(isset($this->postProcessors[$postProcessor])) {
@@ -102,6 +118,9 @@ class A7 implements A7Interface
         }
     }
 
+    /**
+     * @inheritdoc
+     */
     public function initClass($class, $instanceOnly = false)
     {
         if ($instanceOnly) {
@@ -123,11 +142,13 @@ class A7 implements A7Interface
     }
 
     /**
-     * @param $instance
-     * @param $class
+     * @inheritdoc
+     *
+     * @param object $instance
+     * @param string $class
      * @param PostProcessInterface[] $postProcessors
      * @param null|Proxy $proxyInstance
-     * @return mixed
+     * @return object
      */
     public function doPostProcessors($instance, $class, array $postProcessors, $proxyInstance = null)
     {
@@ -156,15 +177,44 @@ class A7 implements A7Interface
         return $instance;
     }
 
-    public static function methodExists($object, $methodName) {
-        if($object instanceof Proxy) {
-            return $object->a7methodExists($methodName);
-        } else {
-            return method_exists($object, $methodName);
+    /**
+     * Synchronization called method and given arguments
+     *
+     * @param string $className
+     * @param string $method
+     * @param array $arguments
+     * @return array
+     */
+    private static function getCallParams($className, $method, array $arguments)
+    {
+        $callParams = [];
+        foreach(ReflectionUtils::getInstance()->getParametersReflection($className, $method) as $parameter) {
+            $parameterName = $parameter->name;
+            if(array_key_exists($parameterName, $arguments)) {
+                if($parameter->isArray()) {
+                    $arguments[$parameterName] = (array)$arguments[$parameterName];
+                }
+                $callParams[] =& $arguments[$parameterName];
+            } else {
+                $val = null;
+                if($parameter->isDefaultValueAvailable()) {
+                    $val = $parameter->getDefaultValue();
+                } elseif($parameter->isArray()) {
+                    $val = [];
+                }
+                $callParams[] = $val;
+            }
         }
+        return $callParams;
     }
 
-    protected function getRealClassName($class)
+    /**
+     * Get real class name
+     *
+     * @param string $class
+     * @return string
+     */
+    private function getRealClassName($class)
     {
         $arr = explode("\\", trim($class, "\\"));
         $name = $arr[count($arr)-1];
@@ -193,7 +243,13 @@ class A7 implements A7Interface
         return $class;
     }
 
-    protected function getInjectableAnnotation($class)
+    /**
+     * Get injectable annotation from class annotation
+     *
+     * @param string $class
+     * @return Injectable
+     */
+    private function getInjectableAnnotation($class)
     {
         $injectable = $this->annotationManager->getClassAnnotation($class, "Injectable");
         if (!isset($injectable)) {
@@ -202,12 +258,24 @@ class A7 implements A7Interface
         return $injectable;
     }
 
-    protected function isSingleton($class)
+    /**
+     * Checks if the class declared singleton
+     *
+     * @param string $class
+     * @return bool
+     */
+    private function isSingleton($class)
     {
         return $this->getInjectableAnnotation($class)->isSingleton();
     }
 
-    protected function isLazy($class)
+    /**
+     * Checks if the class declared lazy
+     *
+     * @param string $class
+     * @return bool
+     */
+    private function isLazy($class)
     {
         return $this->getInjectableAnnotation($class)->lazy;
     }
