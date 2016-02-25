@@ -65,15 +65,15 @@ class Logger implements PostProcessInterface
         return $instance;
     }
 
-    function beforeCall($className, $methodName) {
+    public function beforeCall($className, $methodName) {
         $this->log->info("Start $className->$methodName");
     }
 
-    function afterCall($className, $methodName) {
+    public function afterCall($className, $methodName) {
         $this->log->info("End   $className->$methodName");
     }
 
-    function exceptionHandling($className, $methodName, $exception) {
+    public function exceptionHandling($className, $methodName, $exception) {
         $this->log->error("$className->$methodName", $exception);
     }
 

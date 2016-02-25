@@ -21,16 +21,6 @@ class A7 implements A7Interface
     private static $cache;
 
     /**
-     * Get cache
-     *
-     * @return CacheInterface
-     */
-    public static function getCache()
-    {
-        return self::$cache;
-    }
-
-    /**
      * A7 constructor
      *
      * @param CacheInterface|null $cache
@@ -47,13 +37,24 @@ class A7 implements A7Interface
     }
 
     /**
+     * Get cache
+     *
+     * @return CacheInterface
+     */
+    public static function getCache()
+    {
+        return self::$cache;
+    }
+
+    /**
      * Checks if the class method exists
      *
      * @param object $object
      * @param string $methodName
      * @return bool
      */
-    public static function methodExists($object, $methodName) {
+    public static function methodExists($object, $methodName)
+    {
         if($object instanceof Proxy) {
             return $object->a7methodExists($methodName);
         } else {
@@ -96,7 +97,7 @@ class A7 implements A7Interface
         } else {
             $className = get_class($object);
         }
-        $callParams = static::getCallParams($className, $method, $arguments);
+        $callParams = self::getCallParams($className, $method, $arguments);
         return call_user_func_array([$object, $method], $callParams);
     }
 

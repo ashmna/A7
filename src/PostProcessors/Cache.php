@@ -38,7 +38,7 @@ class Cache implements PostProcessInterface
         return $instance;
     }
 
-    function beforeCall($arguments, $methodName, $className, &$isCallable, &$result, &$params)
+    public function beforeCall($arguments, $methodName, $className, &$isCallable, &$result, &$params)
     {
         $hash = md5(serialize($arguments));
         $key = "$className-$methodName-$hash";
@@ -50,7 +50,7 @@ class Cache implements PostProcessInterface
         }
     }
 
-    function afterCall($arguments, $methodName, $className, &$result, $params)
+    public function afterCall($arguments, $methodName, $className, &$result, $params)
     {
         $hash = md5(serialize($arguments));
         $key = "$className-$methodName-$hash";

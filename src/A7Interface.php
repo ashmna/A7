@@ -19,7 +19,7 @@ interface A7Interface
     /**
      * Call a object method with assoc arguments
      *
-     * @param object $object
+     * @param object|string $object
      * @param string $method
      * @param array $arguments
      * @return mixed

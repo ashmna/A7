@@ -47,7 +47,7 @@ class AnnotationManager implements AnnotationManagerInterface
             foreach ($reflectionProperties as $reflectionProperty) {
                 $propertyAnnotations = self::toAssoc($this->annotationReader->getPropertyAnnotations($reflectionProperty));
                 self::getVar($reflectionProperty->getDocComment(), $propertyAnnotations);
-                $propertiesAnnotations[$reflectionProperty->getName()] = $propertyAnnotations;
+                $propertiesAnnotations[$reflectionProperty->name] = $propertyAnnotations;
             }
             $this->setCache($key, $propertiesAnnotations);
         }
@@ -73,7 +73,7 @@ class AnnotationManager implements AnnotationManagerInterface
             $reflectionMethods = ReflectionUtils::getInstance()->getMethodsReflection($className);
             $methodsAnnotations = [];
             foreach($reflectionMethods as $reflectionMethod) {
-                $methodsAnnotations[$reflectionMethod->getName()] = self::toAssoc($this->annotationReader->getMethodAnnotations($reflectionMethod));
+                $methodsAnnotations[$reflectionMethod->name] = self::toAssoc($this->annotationReader->getMethodAnnotations($reflectionMethod));
             }
             $this->setCache($key, $methodsAnnotations);
         }

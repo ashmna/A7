@@ -8,25 +8,33 @@ class ReflectionUtils implements ReflectionUtilsInterface
 {
     /** @var CacheInterface */
     private $cache;
+    /** @var ReflectionUtils */
     private static $instance;
 
     /**
+     * Get a singltone Instance
+     *
      * @return ReflectionUtilsInterface
      */
     public static function getInstance() {
         if (null === static::$instance) {
-            static::$instance = new static();
+            self::$instance = new self();
         }
 
-        return static::$instance;
+        return self::$instance;
     }
 
+    /**
+     * ReflectionUtils constructor
+     */
     private function __construct()
     {
         $this->cache = new ArrayCache();
     }
 
-    /** @inheritdoc */
+    /**
+     * @inheritdoc
+     */
     public function getClassReflection($className)
     {
         $key = 'A7-CR-'.$className;
@@ -35,7 +43,10 @@ class ReflectionUtils implements ReflectionUtilsInterface
         }
         return $this->getCache($key);
     }
-    /** @inheritdoc */
+
+    /**
+     * @inheritdoc
+     */
     public function getPropertiesReflection($className) {
         $key = 'A7-PR-'.$className;
         if(!$this->inCache($key)) {
@@ -43,7 +54,10 @@ class ReflectionUtils implements ReflectionUtilsInterface
         }
         return $this->getCache($key);
     }
-    /** @inheritdoc */
+
+    /**
+     * @inheritdoc
+     */
     public function getMethodsReflection($className)
     {
         $key = 'A7-MR-'.$className;
@@ -52,7 +66,10 @@ class ReflectionUtils implements ReflectionUtilsInterface
         }
         return $this->getCache($key);
     }
-    /** @inheritdoc */
+
+    /**
+     * @inheritdoc
+     */
     public function getMethodReflection($className, $methodName)
     {
         $key = 'A7-MR-'.$className.'-'.$methodName;
@@ -61,7 +78,10 @@ class ReflectionUtils implements ReflectionUtilsInterface
         }
         return $this->getCache($key);
     }
-    /** @inheritdoc */
+
+    /**
+     * @inheritdoc
+     */
     public function getParametersReflection($className, $methodName)
     {
         $key = 'A7-PR-'.$className.'-'.$methodName;
@@ -71,16 +91,34 @@ class ReflectionUtils implements ReflectionUtilsInterface
         return $this->getCache($key);
     }
 
+    /**
+     * Checks if the exists in cache
+     *
+     * @param string $key
+     * @return bool
+     */
     private function inCache($key)
     {
         return $this->cache->inCache($key);
     }
 
+    /**
+     * Set in cache
+     *
+     * @param string $key
+     * @param mixed $value
+     */
     private function setCache($key, $value)
     {
         $this->cache->setCache($key, $value);
     }
 
+    /**
+     * Get from cache
+     *
+     * @param string $key
+     * @return mixed
+     */
     private function getCache($key)
     {
         return $this->cache->getCache($key);

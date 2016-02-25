@@ -10,7 +10,12 @@ class PostProcessManager implements PostProcessManagerInterface
     /** @var AnnotationManagerInterface */
     protected $annotationManager;
 
-    function __construct(A7Interface $a7, AnnotationManagerInterface $annotationManager) {
+
+    /**
+     * @inheritdoc
+     */
+    public function __construct(A7Interface $a7, AnnotationManagerInterface $annotationManager)
+    {
         $this->a7 = $a7;
         $this->annotationManager = $annotationManager;
     }
@@ -20,25 +25,17 @@ class PostProcessManager implements PostProcessManagerInterface
      */
     public function getPostProcessInstance($postProcessName, array $parameters = [])
     {
-        $postProcessClass = 'A7\PostProcessors\\'.$postProcessName;
+        $postProcessClass = "A7\\PostProcessors\\" . $postProcessName;
 
         $postProcessObject = new $postProcessClass();
         $postProcessReflectionObject = new \ReflectionObject($postProcessObject);
 
-        if($postProcessReflectionObject->hasProperty('a7')) {
-            $a7Property = $postProcessReflectionObject->getProperty('a7');
-            $a7Property->setAccessible(true);
-            $a7Property->setValue($postProcessObject, $this->a7);
-        }
-        if($postProcessReflectionObject->hasProperty('annotationManager')) {
-            $annotationManagerProperty = $postProcessReflectionObject->getProperty('annotationManager');
-            $annotationManagerProperty->setAccessible(true);
-            $annotationManagerProperty->setValue($postProcessObject, $this->annotationManager);
-        }
-        if($postProcessReflectionObject->hasProperty('parameters')) {
-            $annotationManagerProperty = $postProcessReflectionObject->getProperty('parameters');
-            $annotationManagerProperty->setAccessible(true);
-            $annotationManagerProperty->setValue($postProcessObject, $parameters);
+        foreach (["a7", "annotationManager", "parameters"] as $key) {
+            if ($postProcessReflectionObject->hasProperty($key)) {
+                $a7Property = $postProcessReflectionObject->getProperty($key);
+                $a7Property->setAccessible(true);
+                $a7Property->setValue($postProcessObject, $this->$key);
+            }
         }
 
         return $postProcessObject;

@@ -7,33 +7,43 @@ interface ReflectionUtilsInterface
 {
 
     /**
-     * @param $className
+     * Get class reflection
+     *
+     * @param string $className
      * @return \ReflectionClass
      */
     function getClassReflection($className);
 
     /**
-     * @param $className
+     * Get properties reflection
+     *
+     * @param string $className
      * @return \ReflectionProperty[]
      */
     function getPropertiesReflection($className);
 
     /**
-     * @param $className
+     * Get methods reflection
+     *
+     * @param string $className
      * @return \ReflectionMethod[]
      */
     function getMethodsReflection($className);
 
     /**
-     * @param $className
-     * @param $methodName
+     * Get method reflection
+     *
+     * @param string $className
+     * @param string $methodName
      * @return \ReflectionMethod
      */
     function getMethodReflection($className, $methodName);
 
     /**
-     * @param $className
-     * @param $methodName
+     * Get parameters reflection
+     *
+     * @param string $className
+     * @param string $methodName
      * @return \ReflectionParameter[]
      */
     function getParametersReflection($className, $methodName);
