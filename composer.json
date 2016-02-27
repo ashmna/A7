@@ -5,6 +5,7 @@
   "autoload" : {
     "psr-4": {
       "A7\\" : "src",
+      "A7\\Annotations\\" : "src/Annotations",
       "A7\\Tests\\" : "Tests"
     }
   },

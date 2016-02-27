@@ -17,7 +17,7 @@ class AnnotationManager implements AnnotationManagerInterface
     public function __construct()
     {
         $this->cache = A7::getCache();
-        AnnotationRegistry::registerAutoloadNamespace('A7\Annotations', __DIR__ . '/src/');
+        AnnotationRegistry::registerAutoloadNamespace('A7\Annotations', __DIR__);
         $this->annotationReader = new SimpleAnnotationReader();
         $this->annotationReader->addNamespace('A7\Annotations');
     }
