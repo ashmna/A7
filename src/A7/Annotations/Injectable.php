@@ -16,9 +16,10 @@ final class Injectable
     const PROTOTYPE = 'prototype';
 
     public $scope = self::SINGLETON;
-    public $lazy  = true;
+    public $lazy = true;
 
-    public function isSingleton() {
+    public function isSingleton()
+    {
         return $this->scope == self::SINGLETON;
     }
 

@@ -27,7 +27,7 @@ final class Inject
             return;
         }
         // @Inject
-        if (! isset($values['value'])) {
+        if (!isset($values['value'])) {
             return;
         }
         $values = $values['value'];
@@ -38,7 +38,7 @@ final class Inject
         // @Inject({...}) on a method
         if (is_array($values)) {
             foreach ($values as $key => $value) {
-                if (! is_string($value)) {
+                if (!is_string($value)) {
                     throw new \RuntimeException(sprintf(
                         '@Inject({"param" = "value"}) expects "value" to be a string, %s given.',
                         json_encode($value)
@@ -66,7 +66,7 @@ final class Inject
 
     public function setVar($var)
     {
-        if(empty($this->name)) {
+        if (empty($this->name)) {
             $this->name = $var;
         }
     }

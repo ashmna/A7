@@ -12,7 +12,8 @@ final class Transactional
 {
     public $enable = true;
 
-    public function isEnabled() {
+    public function isEnabled()
+    {
         return $this->enable;
     }
 }

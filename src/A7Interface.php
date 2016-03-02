@@ -49,7 +49,7 @@ interface A7Interface
      * @param bool $instanceOnly
      * @return Proxy|object
      */
-    function initClass($class, $instanceOnly = true);
+    function initClass($class, $instanceOnly = false);
 
     /**
      * Do post processors
