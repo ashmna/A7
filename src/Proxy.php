@@ -30,6 +30,7 @@ class Proxy
 
         if(method_exists($this->a7Instance, $methodName)) {
             $isCallable = true;
+            $isThrowable = true;
             $result = null;
             $transferParams = [];
             $params = [
@@ -52,11 +53,16 @@ class Proxy
                     $result = call_user_func_array([$this->a7Instance, $methodName], $arguments);
                 }
             } catch(\Exception $exception) {
-                $params["exception"] = &$exception;
+                $params["isThrowable"] = &$isThrowable;
+                $params["exception"]   = &$exception;
+
                 foreach($this->a7ExceptionHandling as $exceptionHandling) {
                     $this->a7Call($exceptionHandling, $params);
                 }
-                throw $exception;
+
+                if($isThrowable) {
+                    throw $exception;
+                }
             }
 
             foreach($this->a7AfterCall as $afterCall) {
@@ -72,7 +78,8 @@ class Proxy
     public function __get($name)
     {
         $this->a7Init();
-        if(property_exists($this->a7Instance, $name)) {
+        if(property_exists($this->a7Instance, $name)
+            && ReflectionUtils::getInstance()->getPropertyReflection($this->a7ClassName, $name)->isPublic()) {
             return $this->a7Instance->{$name};
         } else {
             throw new \RuntimeException($this->a7ClassName."::\${$name} [get] property not exists");
@@ -82,7 +89,8 @@ class Proxy
     public function __set($name, $value)
     {
         $this->a7Init();
-        if(property_exists($this->a7Instance, $name)) {
+        if(property_exists($this->a7Instance, $name)
+            && ReflectionUtils::getInstance()->getPropertyReflection($this->a7ClassName, $name)->isPublic()) {
             $this->a7Instance->{$name} = $value;
         } else {
             throw new \RuntimeException($this->a7ClassName."::\${$name} [set] property not exists");

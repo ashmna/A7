@@ -46,9 +46,21 @@ class Transaction implements PostProcessInterface
             } elseif (isset($this->parameters['class'])) {
                 $this->DBInstance = $this->a7->get($this->parameters['class']);
             }
-            $this->beginTransaction = isset($this->parameters['beginTransaction']) ? $this->parameters['beginTransaction'] : 'beginTransaction';
-            $this->commit = isset($this->parameters['commit']) ? $this->parameters['commit'] : 'commit';
-            $this->rollback = isset($this->parameters['rollback']) ? $this->parameters['rollback'] : 'rollback';
+            $this->beginTransaction = 'beginTransaction';
+            $this->commit = 'commit';
+            $this->rollback = 'rollback';
+
+            if(isset($this->parameters['beginTransaction'])) {
+                $this->beginTransaction = $this->parameters['beginTransaction'];
+            }
+
+            if(isset($this->parameters['commit'])) {
+                $this->commit = $this->parameters['commit'];
+            }
+
+            if(isset($this->parameters['rollback'])) {
+                $this->rollback = $this->parameters['rollback'];
+            }
 
         }
     }

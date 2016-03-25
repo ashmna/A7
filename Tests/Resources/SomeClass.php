@@ -15,6 +15,8 @@ class SomeClass
         $this->a = $a;
         $this->b = $b;
         $this->c = $c;
+
+        return $a*$b*$c;
     }
 
     public function someMethod2($d)

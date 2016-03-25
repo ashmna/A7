@@ -14,10 +14,10 @@ class ProxyTest extends AbstractUnitTestCase
 {
 
     // Test class
-    /** @var Proxy */
+    /** @var Proxy|SomeClass */
     private $proxy;
     // Mocks
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|\A7\A7Interface */
     private $a7;
     private $someClassName = "A7\\Tests\\Resources\\SomeClass";
 
@@ -65,7 +65,6 @@ class ProxyTest extends AbstractUnitTestCase
     {
         // Test Data
         $instance = new SomeClass();
-        /** @noinspection PhpParamsInspection */
         $this->proxy = new Proxy($this->a7, $this->someClassName, $instance);
         $postProcessor = new SomePostProcess();
         $this->proxy->a7AddPostProcessor($postProcessor);
@@ -95,7 +94,6 @@ class ProxyTest extends AbstractUnitTestCase
         // Test Data
         $instance = new SomeClass();
         $instance->someMethod(10, 20, 30);
-        /** @noinspection PhpParamsInspection */
         $this->proxy = new Proxy($this->a7, $this->someClassName, $instance);
         // Run Test
         $this->assertEquals(10, $this->proxy->a);
@@ -107,11 +105,11 @@ class ProxyTest extends AbstractUnitTestCase
     public function testGetMethodWithException()
     {
         // Test Data
-        /** @noinspection PhpParamsInspection */
         $this->proxy = new Proxy($this->a7, $this->someClassName, new SomeClass());
         // Run Test
         try {
-            $d = $this->proxy->d;
+            $this->proxy->d;
+            $this->fail("Private property is visible.");
         } catch (\RuntimeException $e) {
             $this->assertInstanceOf("\\RuntimeException", $e);
             $this->assertEquals("A7\\Tests\\Resources\\SomeClass::\$d [get] property not exists", $e->getMessage());
@@ -122,8 +120,7 @@ class ProxyTest extends AbstractUnitTestCase
     public function testSetMethod()
     {
         // Test Data
-        /** @noinspection PhpParamsInspection */
-        $this->proxy = new Proxy($this->a7, $this->someClassName, new SomeClass);
+        $this->proxy = new Proxy($this->a7, $this->someClassName, new SomeClass());
         // Run Test
         $this->proxy->a = 2345;
         $this->assertEquals(2345, $this->proxy->a);
@@ -135,16 +132,189 @@ class ProxyTest extends AbstractUnitTestCase
     public function testSetMethodWithException()
     {
         // Test Data
-        /** @noinspection PhpParamsInspection */
         $this->proxy = new Proxy($this->a7, $this->someClassName, new SomeClass());
         // Run Test
         try {
             $this->proxy->d = 6789;
+            $this->fail("Private property is visible.");
         } catch (\RuntimeException $e) {
             $this->assertInstanceOf("\\RuntimeException", $e);
             $this->assertEquals("A7\\Tests\\Resources\\SomeClass::\$d [set] property not exists", $e->getMessage());
             throw $e;
         }
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testGetMethodWithExceptionWithProtectedProperty()
+    {
+        // Test Data
+        $this->proxy = new Proxy($this->a7, $this->someClassName, new SomeClass());
+        // Run Test
+        try {
+            $this->proxy->c;
+            $this->fail("Protected property is visible.");
+        } catch (\RuntimeException $e) {
+            $this->assertInstanceOf("\\RuntimeException", $e);
+            $this->assertEquals("A7\\Tests\\Resources\\SomeClass::\$c [get] property not exists", $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testSetMethodWithExceptionWithProtectedProperty()
+    {
+        // Test Data
+        $this->proxy = new Proxy($this->a7, $this->someClassName, new SomeClass());
+        // Run Test
+        try {
+            $this->proxy->c = 1;
+            $this->fail("Protected property is visible.");
+        } catch (\RuntimeException $e) {
+            $this->assertInstanceOf("\\RuntimeException", $e);
+            $this->assertEquals("A7\\Tests\\Resources\\SomeClass::\$c [set] property not exists", $e->getMessage());
+            throw $e;
+        }
+    }
+
+    public function testA7AddBeforeCall()
+    {
+        // Test Data
+        $handelFunction = [$this, "emptyHandelFunction"];
+        // Run Test
+        $this->proxy->a7AddBeforeCall([]);
+        $this->proxy->a7AddBeforeCall($handelFunction);
+        $beforeCallList = $this->getMember($this->proxy, "a7BeforeCall");
+        $this->assertEquals([$handelFunction], $beforeCallList);
+    }
+
+    public function testA7AddAfterCall()
+    {
+        // Test Data
+        $handelFunction = [$this, "emptyHandelFunction"];
+        // Run Test
+        $this->proxy->a7AddAfterCall([]);
+        $this->proxy->a7AddAfterCall($handelFunction);
+        $afterCallList = $this->getMember($this->proxy, "a7AfterCall");
+        $this->assertEquals([$handelFunction], $afterCallList);
+    }
+
+    public function testA7AddExceptionHandling()
+    {
+        // Test Data
+        $handelFunction = [$this, "emptyHandelFunction"];
+        // Run Test
+        $this->proxy->a7AddExceptionHandling([]);
+        $this->proxy->a7AddExceptionHandling($handelFunction);
+        $exceptionHandlingList = $this->getMember($this->proxy, "a7ExceptionHandling");
+        $this->assertEquals([$handelFunction], $exceptionHandlingList);
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testCallUnknownMethod()
+    {
+        try {
+            /** @noinspection PhpUndefinedMethodInspection */
+            $this->proxy->unknownMethod();
+            $this->fail("Called not existing method.");
+        } catch (\RuntimeException $e) {
+            $this->assertInstanceOf("\\RuntimeException", $e);
+            $this->assertEquals("A7\\Tests\\Resources\\SomeClass::unknownMethod() method not exists", $e->getMessage());
+            throw $e;
+        }
+    }
+
+    public function testCallMethodWithBeforeHandelFunction()
+    {
+        /*// Test Data
+        $instance = new SomeClass();
+        $this->proxy->a7AddBeforeCall([$this, "emptyHandelFunction"]);
+        $paramsBeforeCall = [
+            "object"     => $instance,
+            "className"  => $this->someClassName,
+            "methodName" => "someMethod",
+            "arguments"  => [1, 2, 3],
+            "result"     => null,
+            "params"     => [],
+            "isCallable" => true,
+        ];
+        // Expectations
+        $this->a7
+            ->expects($this->once())
+            ->method("initClass")
+            ->with($this->someClassName, true)
+            ->willReturn($instance);
+        $this->a7
+            ->expects($this->once())
+            ->method("call")
+            ->with($this, "emptyHandelFunction", $paramsBeforeCall);
+        // Run Test
+        $result = $this->proxy->someMethod(1, 2, 3);
+        $this->assertEquals(6, $result);*/
+    }
+
+    public function testCallMethodWithAfterHandelFunction()
+    {
+       /* // Test Data
+        $instance = new SomeClass();
+        $this->proxy->a7AddAfterCall([$this, "emptyHandelFunction"]);
+        $paramsAfterCall = [
+            "object"     => $instance,
+            "className"  => $this->someClassName,
+            "methodName" => "someMethod",
+            "arguments"  => [1, 2, 3],
+            "result"     => 6,
+            "params"     => [],
+            "isCallable" => true,
+        ];
+        // Expectations
+        $this->a7
+            ->expects($this->once())
+            ->method("initClass")
+            ->with($this->someClassName, true)
+            ->willReturn($instance);
+        $this->a7
+            ->expects($this->once())
+            ->method("call")
+            ->with($this, "emptyHandelFunction", $paramsAfterCall);
+        // Run Test
+        $result = $this->proxy->someMethod(1, 2, 3);
+        $this->assertEquals(6, $result);*/
+    }
+
+    // Util Methods
+
+    public function emptyHandelFunction()
+    {
+    }
+
+    public function beforeCallHandelFunction($object, $className, $methodName, $arguments, $result, $params, $isCallable)
+    {
+//        $this->assertInstanceOf($this->someClassName, $object);
+//        $this->assertEquals($this->someClassName, $className);
+//        $this->assertEquals("someMethod", $methodName);
+//        $this->assertEquals([1, 2, 3], $arguments);
+//        $this->assertNull($result);
+//        $this->assertEquals([], $params);
+//        $this->assertTrue($isCallable);
+    }
+
+    public function afterCallHandelFunction($object, $className, $methodName, $arguments, $result, $params, $isCallable)
+    {
+//        $this->assertInstanceOf($this->someClassName, $object);
+//        $this->assertEquals($this->someClassName, $className);
+//        $this->assertEquals("someMethod", $methodName);
+//        $this->assertEquals([1, 2, 3], $arguments);
+//        $this->assertEquals(6, $result);
+//        $this->assertEquals([], $params);
+//        $this->assertTrue($isCallable);
+//
+//        $result = 90;
     }
 
 }

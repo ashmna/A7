@@ -37,7 +37,7 @@ class ReflectionUtils implements ReflectionUtilsInterface
      */
     public function getClassReflection($className)
     {
-        $key = 'A7-CR-'.$className;
+        $key = "A7-CR-".$className;
         if(!$this->inCache($key)) {
             $this->setCache($key, new \ReflectionClass($className));
         }
@@ -48,9 +48,9 @@ class ReflectionUtils implements ReflectionUtilsInterface
      * @inheritdoc
      */
     public function getPropertiesReflection($className) {
-        $key = 'A7-PR-'.$className;
+        $key = "A7-PR-".$className;
         if(!$this->inCache($key)) {
-            $this->setCache($key, $this->getClassReflection($className)->getProperties());
+            $this->setCache($key, $this->getClassReflection($className)->getProperties(\ReflectionProperty::IS_PUBLIC));
         }
         return $this->getCache($key);
     }
@@ -58,9 +58,22 @@ class ReflectionUtils implements ReflectionUtilsInterface
     /**
      * @inheritdoc
      */
+    public function getPropertyReflection($className, $propertyName)
+    {
+        $key = "A7-PR-".$className."-".$propertyName;
+        if(!$this->inCache($key)) {
+            $this->setCache($key, $this->getClassReflection($className)->getProperty($propertyName));
+        }
+        return $this->getCache($key);
+    }
+
+
+    /**
+     * @inheritdoc
+     */
     public function getMethodsReflection($className)
     {
-        $key = 'A7-MR-'.$className;
+        $key = "A7-MR-".$className;
         if(!$this->inCache($key)) {
             $this->setCache($key, $this->getClassReflection($className)->getMethods());
         }
@@ -72,7 +85,7 @@ class ReflectionUtils implements ReflectionUtilsInterface
      */
     public function getMethodReflection($className, $methodName)
     {
-        $key = 'A7-MR-'.$className.'-'.$methodName;
+        $key = "A7-MR-".$className."-".$methodName;
         if(!$this->inCache($key)) {
             $this->setCache($key, new \ReflectionMethod($className, $methodName));
         }
@@ -84,7 +97,7 @@ class ReflectionUtils implements ReflectionUtilsInterface
      */
     public function getParametersReflection($className, $methodName)
     {
-        $key = 'A7-PR-'.$className.'-'.$methodName;
+        $key = "A7-PR-".$className."-".$methodName;
         if(!$this->inCache($key)) {
             $this->setCache($key, $this->getMethodReflection($className, $methodName)->getParameters());
         }
