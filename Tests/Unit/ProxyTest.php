@@ -231,18 +231,9 @@ class ProxyTest extends AbstractUnitTestCase
 
     public function testCallMethodWithBeforeHandelFunction()
     {
-        /*// Test Data
+        // Test Data
         $instance = new SomeClass();
         $this->proxy->a7AddBeforeCall([$this, "emptyHandelFunction"]);
-        $paramsBeforeCall = [
-            "object"     => $instance,
-            "className"  => $this->someClassName,
-            "methodName" => "someMethod",
-            "arguments"  => [1, 2, 3],
-            "result"     => null,
-            "params"     => [],
-            "isCallable" => true,
-        ];
         // Expectations
         $this->a7
             ->expects($this->once())
@@ -251,27 +242,17 @@ class ProxyTest extends AbstractUnitTestCase
             ->willReturn($instance);
         $this->a7
             ->expects($this->once())
-            ->method("call")
-            ->with($this, "emptyHandelFunction", $paramsBeforeCall);
+            ->method("call");
         // Run Test
         $result = $this->proxy->someMethod(1, 2, 3);
-        $this->assertEquals(6, $result);*/
+        $this->assertEquals(6, $result);
     }
 
     public function testCallMethodWithAfterHandelFunction()
     {
-       /* // Test Data
+        // Test Data
         $instance = new SomeClass();
         $this->proxy->a7AddAfterCall([$this, "emptyHandelFunction"]);
-        $paramsAfterCall = [
-            "object"     => $instance,
-            "className"  => $this->someClassName,
-            "methodName" => "someMethod",
-            "arguments"  => [1, 2, 3],
-            "result"     => 6,
-            "params"     => [],
-            "isCallable" => true,
-        ];
         // Expectations
         $this->a7
             ->expects($this->once())
@@ -280,11 +261,37 @@ class ProxyTest extends AbstractUnitTestCase
             ->willReturn($instance);
         $this->a7
             ->expects($this->once())
-            ->method("call")
-            ->with($this, "emptyHandelFunction", $paramsAfterCall);
+            ->method("call");
         // Run Test
         $result = $this->proxy->someMethod(1, 2, 3);
-        $this->assertEquals(6, $result);*/
+        $this->assertEquals(6, $result);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testCallMethodWithThrow()
+    {
+        // Test Data
+        $instance = new SomeClass();
+        $this->proxy->a7AddExceptionHandling([$this, "emptyHandelFunction"]);
+        // Expectations
+        $this->a7
+            ->expects($this->once())
+            ->method("initClass")
+            ->with($this->someClassName, true)
+            ->willReturn($instance);
+        $this->a7
+            ->expects($this->once())
+            ->method("call");
+        // Run Test
+        try {
+            $this->proxy->throwMethod();
+        } catch (\Exception $e) {
+            $this->assertInstanceOf("\\Exception", $e);
+            $this->assertEquals("Test Exception", $e->getMessage());
+            throw $e;
+        }
     }
 
     // Util Methods
@@ -295,26 +302,26 @@ class ProxyTest extends AbstractUnitTestCase
 
     public function beforeCallHandelFunction($object, $className, $methodName, $arguments, $result, $params, $isCallable)
     {
-//        $this->assertInstanceOf($this->someClassName, $object);
-//        $this->assertEquals($this->someClassName, $className);
-//        $this->assertEquals("someMethod", $methodName);
-//        $this->assertEquals([1, 2, 3], $arguments);
-//        $this->assertNull($result);
-//        $this->assertEquals([], $params);
-//        $this->assertTrue($isCallable);
+        // $this->assertInstanceOf($this->someClassName, $object);
+        // $this->assertEquals($this->someClassName, $className);
+        // $this->assertEquals("someMethod", $methodName);
+        // $this->assertEquals([1, 2, 3], $arguments);
+        // $this->assertNull($result);
+        // $this->assertEquals([], $params);
+        // $this->assertTrue($isCallable);
     }
 
     public function afterCallHandelFunction($object, $className, $methodName, $arguments, $result, $params, $isCallable)
     {
-//        $this->assertInstanceOf($this->someClassName, $object);
-//        $this->assertEquals($this->someClassName, $className);
-//        $this->assertEquals("someMethod", $methodName);
-//        $this->assertEquals([1, 2, 3], $arguments);
-//        $this->assertEquals(6, $result);
-//        $this->assertEquals([], $params);
-//        $this->assertTrue($isCallable);
-//
-//        $result = 90;
+        // $this->assertInstanceOf($this->someClassName, $object);
+        // $this->assertEquals($this->someClassName, $className);
+        // $this->assertEquals("someMethod", $methodName);
+        // $this->assertEquals([1, 2, 3], $arguments);
+        // $this->assertEquals(6, $result);
+        // $this->assertEquals([], $params);
+        // $this->assertTrue($isCallable);
+
+        // $result = 90;
     }
 
 }

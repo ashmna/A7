@@ -12,7 +12,7 @@ class ReflectionUtils implements ReflectionUtilsInterface
     private static $instance;
 
     /**
-     * Get a singltone Instance
+     * Get a singleton Instance
      *
      * @return ReflectionUtilsInterface
      */

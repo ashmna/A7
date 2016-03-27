@@ -2,7 +2,14 @@
 
 namespace A7\Tests\Resources;
 
-
+/**
+ * Class SomeClass
+ * @package A7\Tests\Resources
+ *
+ * @property int $a public
+ * @property int $b private
+ * @property int $c protected
+ */
 class SomeClass
 {
 
@@ -22,5 +29,10 @@ class SomeClass
     public function someMethod2($d)
     {
         return $d;
+    }
+
+    public function throwMethod()
+    {
+        throw new \Exception("Test Exception");
     }
 }
