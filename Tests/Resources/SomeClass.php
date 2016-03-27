@@ -9,6 +9,7 @@ namespace A7\Tests\Resources;
  * @property int $a public
  * @property int $b private
  * @property int $c protected
+ * @method void unknownMethod not exists method
  */
 class SomeClass
 {

@@ -24,7 +24,6 @@ class ProxyTest extends AbstractUnitTestCase
     public function setUp()
     {
         $this->a7 = $this->getMockBuilder("\\A7\\A7")->getMock();
-        /** @noinspection PhpParamsInspection */
         $this->proxy = new Proxy($this->a7, $this->someClassName);
     }
 
@@ -45,7 +44,6 @@ class ProxyTest extends AbstractUnitTestCase
     public function testA7methodExists()
     {
         // Test Data
-        /** @noinspection PhpParamsInspection */
         $this->proxy = new Proxy($this->a7, $this->someClassName, new SomeClass());
         // Run Test
         $res = $this->proxy->a7methodExists("someMethod");
@@ -219,7 +217,6 @@ class ProxyTest extends AbstractUnitTestCase
     public function testCallUnknownMethod()
     {
         try {
-            /** @noinspection PhpUndefinedMethodInspection */
             $this->proxy->unknownMethod();
             $this->fail("Called not existing method.");
         } catch (\RuntimeException $e) {
