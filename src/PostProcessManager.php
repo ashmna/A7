@@ -32,9 +32,16 @@ class PostProcessManager implements PostProcessManagerInterface
 
         foreach (["a7", "annotationManager", "parameters"] as $key) {
             if ($postProcessReflectionObject->hasProperty($key)) {
+
+                if($key != "parameters") {
+                    $val = $this->$key;
+                } else {
+                    $val = $parameters;
+                }
+
                 $a7Property = $postProcessReflectionObject->getProperty($key);
                 $a7Property->setAccessible(true);
-                $a7Property->setValue($postProcessObject, $this->$key);
+                $a7Property->setValue($postProcessObject, $val);
             }
         }
 
