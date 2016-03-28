@@ -28,5 +28,4 @@ class AImpl implements A
         return $this->b->getDemoValue();
     }
 
-
 }
