@@ -50,7 +50,7 @@ class ReflectionUtils implements ReflectionUtilsInterface
     public function getPropertiesReflection($className) {
         $key = "A7-PR-".$className;
         if(!$this->inCache($key)) {
-            $this->setCache($key, $this->getClassReflection($className)->getProperties(\ReflectionProperty::IS_PUBLIC));
+            $this->setCache($key, $this->getClassReflection($className)->getProperties());
         }
         return $this->getCache($key);
     }

@@ -15,7 +15,7 @@ interface ReflectionUtilsInterface
     function getClassReflection($className);
 
     /**
-     * Get public properties reflection
+     * Get properties reflection
      *
      * @param string $className
      * @return \ReflectionProperty[]

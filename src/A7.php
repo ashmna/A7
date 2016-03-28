@@ -129,6 +129,7 @@ class A7 implements A7Interface
         } else {
             if ($this->isLazy($class)) {
                 $instance = new Proxy($this, $class);
+                $this->syncPostProcessors($instance);
                 $instanceOnly = true;
             } else {
                 $instance = new $class();
@@ -281,4 +282,10 @@ class A7 implements A7Interface
         return $this->getInjectableAnnotation($class)->lazy;
     }
 
+    private function syncPostProcessors(Proxy $proxy)
+    {
+        foreach($this->postProcessors as $postProcessor) {
+            $proxy->a7AddPostProcessor($postProcessor);
+        }
+    }
 }

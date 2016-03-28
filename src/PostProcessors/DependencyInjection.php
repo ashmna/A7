@@ -18,13 +18,7 @@ class DependencyInjection implements PostProcessInterface
 
     public function postProcessBeforeInitialization($instance, $className)
     {
-        if ($instance instanceof Proxy) {
-            $instance->a7AddPostProcessor($this);
-        } else {
-            $instance = $this->doInjection($instance, $className);
-        }
-
-        return $instance;
+        return $this->doInjection($instance, $className);
     }
 
     public function postProcessAfterInitialization($instance, $className)
@@ -38,25 +32,30 @@ class DependencyInjection implements PostProcessInterface
 
         foreach ($propertiesAnnotations as $propertyName => $annotations) {
             if (isset($annotations['Inject'])) {
-                /** @var \A7\Annotations\Inject $inject */
-                $inject = $annotations['Inject'];
-                $reflectionProperty = new \ReflectionProperty($instance, $propertyName);
-                $reflectionProperty->setAccessible(true);
-                if (isset($annotations['var'])) {
-                    $inject->setVar($annotations['var']);
-                }
-                
-                if ($inject->isInjectObject()) {
-                    $reflectionProperty->setValue($instance, $this->a7->get($inject->getName()));
-                } else {
-                    $name = $inject->getName();
-                    if (isset($name) && isset($this->parameters[$name])) {
-                        $reflectionProperty->setValue($instance, $this->parameters[$name]);
-                    }
-                }
+                $this->injectProperty($instance, $propertyName, $annotations);
             }
         }
         return $instance;
+    }
+
+    private function injectProperty($instance, $propertyName, $annotations)
+    {
+        /** @var \A7\Annotations\Inject $inject */
+        $inject = $annotations['Inject'];
+        $reflectionProperty = new \ReflectionProperty($instance, $propertyName);
+        $reflectionProperty->setAccessible(true);
+        if (isset($annotations['var'])) {
+            $inject->setVar($annotations['var']);
+        }
+
+        if ($inject->isInjectObject()) {
+            $reflectionProperty->setValue($instance, $this->a7->get($inject->getName()));
+        } else {
+            $name = $inject->getName();
+            if (isset($name) && isset($this->parameters[$name])) {
+                $reflectionProperty->setValue($instance, $this->parameters[$name]);
+            }
+        }
     }
 
 }

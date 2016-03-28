@@ -16,7 +16,6 @@ class Proxy
     private $a7AfterCall  = [];
     private $a7ExceptionHandling = [];
 
-
     public function __construct(A7Interface $a7, $className, $instance = null)
     {
         $this->a7 = $a7;

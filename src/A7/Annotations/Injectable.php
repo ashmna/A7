@@ -12,8 +12,8 @@ namespace A7\Annotations;
 final class Injectable
 {
 
-    const SINGLETON = 'singleton';
-    const PROTOTYPE = 'prototype';
+    const SINGLETON = "singleton";
+    const PROTOTYPE = "prototype";
 
     public $scope = self::SINGLETON;
     public $lazy = true;

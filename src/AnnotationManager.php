@@ -17,14 +17,14 @@ class AnnotationManager implements AnnotationManagerInterface
     public function __construct()
     {
         $this->cache = A7::getCache();
-        AnnotationRegistry::registerAutoloadNamespace('A7\Annotations', __DIR__);
+        AnnotationRegistry::registerAutoloadNamespace("A7\\Annotations", __DIR__);
         $this->annotationReader = new SimpleAnnotationReader();
-        $this->annotationReader->addNamespace('A7\Annotations');
+        $this->annotationReader->addNamespace("A7\\Annotations");
     }
 
     public function getClassAnnotations($className)
     {
-        $key = 'A7-CA-'.$className;
+        $key = "A7-CA-".$className;
         if(!$this->inCache($key)) {
             $reflectionClass = ReflectionUtils::getInstance()->getClassReflection($className);
             $this->setCache($key, self::toAssoc($this->annotationReader->getClassAnnotations($reflectionClass)));
@@ -40,7 +40,7 @@ class AnnotationManager implements AnnotationManagerInterface
 
     public function getPropertiesAnnotations($className)
     {
-        $key = 'A7-PA-'.$className;
+        $key = "A7-PA-".$className;
         if(!$this->inCache($key)) {
             $reflectionProperties = ReflectionUtils::getInstance()->getPropertiesReflection($className);
             $propertiesAnnotations = [];
@@ -68,7 +68,7 @@ class AnnotationManager implements AnnotationManagerInterface
 
     public function getMethodsAnnotations($className)
     {
-        $key = 'A7-MA-'.$className;
+        $key = "A7-MA-".$className;
         if(!$this->inCache($key)) {
             $reflectionMethods = ReflectionUtils::getInstance()->getMethodsReflection($className);
             $methodsAnnotations = [];
@@ -107,12 +107,11 @@ class AnnotationManager implements AnnotationManagerInterface
         return $this->cache->getCache($key);
     }
 
-
     private static function toAssoc($annotations) {
         $newAnnotations = [];
         if(!empty($annotations)) {
             foreach($annotations as $annotation) {
-                $newAnnotations[basename(str_replace('\\', DIRECTORY_SEPARATOR, get_class($annotation)))] = $annotation;
+                $newAnnotations[basename(str_replace("\\", DIRECTORY_SEPARATOR, get_class($annotation)))] = $annotation;
             }
         }
         return $newAnnotations;
@@ -120,7 +119,7 @@ class AnnotationManager implements AnnotationManagerInterface
 
     private static function getVar($docComment, &$propertyAnnotations) {
         if(!empty($docComment) && preg_match("/@var\s+([\w\\\\]+)/", $docComment, $output) !== false) {
-            if(isset($output[1])) $propertyAnnotations['var'] = $output[1];
+            if(isset($output[1])) $propertyAnnotations["var"] = $output[1];
         }
     }
 

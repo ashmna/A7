@@ -13,7 +13,6 @@ namespace A7\Tests\Resources;
  */
 class SomeClass
 {
-
     public $a;
     private $b;
     protected $c;
@@ -36,4 +35,5 @@ class SomeClass
     {
         throw new \Exception("Test Exception");
     }
+
 }
