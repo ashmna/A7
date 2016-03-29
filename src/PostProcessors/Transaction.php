@@ -108,9 +108,9 @@ class Transaction extends AbstractPostProcess
             $isTransactional = $methodTransactional->isEnabled();
         }
 
-        $isTransactional = boolval($isTransactional & isset($this->DBInstance));
+        $isTransactional &= isset($this->DBInstance);
 
-        return $isTransactional;
+        return (bool) $isTransactional;
     }
 
 }
