@@ -37,6 +37,11 @@ class ProxyTest extends AbstractUnitTestCase
             ->method("initClass")
             ->with($this->someClassName, true)
             ->willReturn($instance);
+        $this->a7
+            ->expects($this->once())
+            ->method("doPostProcessors")
+            ->with($instance, $this->someClassName, [], $this->proxy)
+            ->willReturn($instance);
         // Run Test
         $this->invokeMethod($this->proxy, "a7Init", []);
     }
@@ -44,7 +49,14 @@ class ProxyTest extends AbstractUnitTestCase
     public function testA7methodExists()
     {
         // Test Data
-        $this->proxy = new Proxy($this->a7, $this->someClassName, new SomeClass());
+        $instance = new SomeClass();
+        $this->proxy = new Proxy($this->a7, $this->someClassName, $instance);
+        // Expectations
+        $this->a7
+            ->expects($this->once())
+            ->method("doPostProcessors")
+            ->with($instance, $this->someClassName, [], $this->proxy)
+            ->willReturn($instance);
         // Run Test
         $res = $this->proxy->a7methodExists("someMethod");
         $this->assertTrue($res);
@@ -93,6 +105,12 @@ class ProxyTest extends AbstractUnitTestCase
         $instance = new SomeClass();
         $instance->someMethod(10, 20, 30);
         $this->proxy = new Proxy($this->a7, $this->someClassName, $instance);
+        // Expectations
+        $this->a7
+            ->expects($this->once())
+            ->method("doPostProcessors")
+            ->with($instance, $this->someClassName, [], $this->proxy)
+            ->willReturn($instance);
         // Run Test
         $this->assertEquals(10, $this->proxy->a);
     }
@@ -103,7 +121,14 @@ class ProxyTest extends AbstractUnitTestCase
     public function testGetMethodWithException()
     {
         // Test Data
-        $this->proxy = new Proxy($this->a7, $this->someClassName, new SomeClass());
+        $instance = new SomeClass();
+        $this->proxy = new Proxy($this->a7, $this->someClassName, $instance);
+        // Expectations
+        $this->a7
+            ->expects($this->once())
+            ->method("doPostProcessors")
+            ->with($instance, $this->someClassName, [], $this->proxy)
+            ->willReturn($instance);
         // Run Test
         try {
             $this->proxy->d;
@@ -118,7 +143,14 @@ class ProxyTest extends AbstractUnitTestCase
     public function testSetMethod()
     {
         // Test Data
-        $this->proxy = new Proxy($this->a7, $this->someClassName, new SomeClass());
+        $instance = new SomeClass();
+        $this->proxy = new Proxy($this->a7, $this->someClassName, $instance);
+        // Expectations
+        $this->a7
+            ->expects($this->once())
+            ->method("doPostProcessors")
+            ->with($instance, $this->someClassName, [], $this->proxy)
+            ->willReturn($instance);
         // Run Test
         $this->proxy->a = 2345;
         $this->assertEquals(2345, $this->proxy->a);
@@ -130,7 +162,14 @@ class ProxyTest extends AbstractUnitTestCase
     public function testSetMethodWithException()
     {
         // Test Data
-        $this->proxy = new Proxy($this->a7, $this->someClassName, new SomeClass());
+        $instance = new SomeClass();
+        $this->proxy = new Proxy($this->a7, $this->someClassName, $instance);
+        // Expectations
+        $this->a7
+            ->expects($this->once())
+            ->method("doPostProcessors")
+            ->with($instance, $this->someClassName, [], $this->proxy)
+            ->willReturn($instance);
         // Run Test
         try {
             $this->proxy->d = 6789;
@@ -148,7 +187,14 @@ class ProxyTest extends AbstractUnitTestCase
     public function testGetMethodWithExceptionWithProtectedProperty()
     {
         // Test Data
-        $this->proxy = new Proxy($this->a7, $this->someClassName, new SomeClass());
+        $instance = new SomeClass();
+        $this->proxy = new Proxy($this->a7, $this->someClassName, $instance);
+        // Expectations
+        $this->a7
+            ->expects($this->once())
+            ->method("doPostProcessors")
+            ->with($instance, $this->someClassName, [], $this->proxy)
+            ->willReturn($instance);
         // Run Test
         try {
             $this->proxy->c;
@@ -166,7 +212,14 @@ class ProxyTest extends AbstractUnitTestCase
     public function testSetMethodWithExceptionWithProtectedProperty()
     {
         // Test Data
-        $this->proxy = new Proxy($this->a7, $this->someClassName, new SomeClass());
+        $instance = new SomeClass();
+        $this->proxy = new Proxy($this->a7, $this->someClassName, $instance);
+        // Expectations
+        $this->a7
+            ->expects($this->once())
+            ->method("doPostProcessors")
+            ->with($instance, $this->someClassName, [], $this->proxy)
+            ->willReturn($instance);
         // Run Test
         try {
             $this->proxy->c = 1;
@@ -239,6 +292,11 @@ class ProxyTest extends AbstractUnitTestCase
             ->willReturn($instance);
         $this->a7
             ->expects($this->once())
+            ->method("doPostProcessors")
+            ->with($instance, $this->someClassName, [], $this->proxy)
+            ->willReturn($instance);
+        $this->a7
+            ->expects($this->once())
             ->method("call");
         // Run Test
         $result = $this->proxy->someMethod(1, 2, 3);
@@ -255,6 +313,11 @@ class ProxyTest extends AbstractUnitTestCase
             ->expects($this->once())
             ->method("initClass")
             ->with($this->someClassName, true)
+            ->willReturn($instance);
+        $this->a7
+            ->expects($this->once())
+            ->method("doPostProcessors")
+            ->with($instance, $this->someClassName, [], $this->proxy)
             ->willReturn($instance);
         $this->a7
             ->expects($this->once())
@@ -277,6 +340,11 @@ class ProxyTest extends AbstractUnitTestCase
             ->expects($this->once())
             ->method("initClass")
             ->with($this->someClassName, true)
+            ->willReturn($instance);
+        $this->a7
+            ->expects($this->once())
+            ->method("doPostProcessors")
+            ->with($instance, $this->someClassName, [], $this->proxy)
             ->willReturn($instance);
         $this->a7
             ->expects($this->once())

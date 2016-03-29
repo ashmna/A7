@@ -3,7 +3,7 @@
 namespace A7\PostProcessors;
 
 
-use A7\PostProcessInterface;
+use A7\AbstractPostProcess;
 use A7\Proxy;
 
 /**
@@ -19,110 +19,98 @@ use A7\Proxy;
  *
  * @package A7\PostProcessors
  */
-class Transaction implements PostProcessInterface
+class Transaction extends AbstractPostProcess
 {
-    /** @var \A7\A7 */
-    protected $a7;
-    /** @var \A7\AnnotationManager */
-    protected $annotationManager;
-    /** @var array  */
-    protected $parameters;
-
-    private $isInit = false;
+    /** @var \stdClass|NULL */
     private $DBInstance;
+    /** @var string */
     private $beginTransaction;
+    /** @var string */
     private $commit;
+    /** @var string */
     private $rollback;
 
-
-    private function init()
+    public function init()
     {
-        if(!$this->isInit) {
-            $this->isInit = true;
-            $this->DBInstance = null;
+        $this->DBInstance = null;
 
-            if(isset($this->parameters['instance']) && is_object($this->parameters['instance'])) {
-                $this->DBInstance = $this->parameters['instance'];
-            } elseif (isset($this->parameters['class'])) {
-                $this->DBInstance = $this->a7->get($this->parameters['class']);
-            }
-            $this->beginTransaction = 'beginTransaction';
-            $this->commit = 'commit';
-            $this->rollback = 'rollback';
-
-            if(isset($this->parameters['beginTransaction'])) {
-                $this->beginTransaction = $this->parameters['beginTransaction'];
-            }
-
-            if(isset($this->parameters['commit'])) {
-                $this->commit = $this->parameters['commit'];
-            }
-
-            if(isset($this->parameters['rollback'])) {
-                $this->rollback = $this->parameters['rollback'];
-            }
-
+        if(isset($this->parameters['instance']) && is_object($this->parameters['instance'])) {
+            $this->DBInstance = $this->parameters['instance'];
+        } elseif (isset($this->parameters['class'])) {
+            $this->DBInstance = $this->a7->get($this->parameters['class']);
         }
-    }
 
-    public function postProcessBeforeInitialization($instance, $className)
-    {
-        $this->init();
+        $this->beginTransaction = 'beginTransaction';
+        $this->commit           = 'commit';
+        $this->rollback         = 'rollback';
 
-        return $instance;
+        if(isset($this->parameters['beginTransaction'])) {
+            $this->beginTransaction = $this->parameters['beginTransaction'];
+        }
+
+        if(isset($this->parameters['commit'])) {
+            $this->commit = $this->parameters['commit'];
+        }
+
+        if(isset($this->parameters['rollback'])) {
+            $this->rollback = $this->parameters['rollback'];
+        }
     }
 
     public function postProcessAfterInitialization($instance, $className)
     {
-        /** @var \A7\Annotations\Transactional $transactional */
-        $transactional = $this->annotationManager->getClassAnnotation($className, 'Transactional');
-        if(isset($transactional) && $transactional->isEnabled()) {
-
-            if (!($instance instanceof Proxy)) {
-                $instance = new Proxy($this->a7, $className, $instance);
-            }
-
-            $instance->a7AddBeforeCall([$this, 'beginTransaction']);
-            $instance->a7AddAfterCall([$this, 'commit']);
-
-            $instance->a7AddExceptionHandling([$this, 'rollback']);
-
+        if (!($instance instanceof Proxy)) {
+            $instance = new Proxy($this->a7, $className, $instance);
         }
+
+        $instance->a7AddBeforeCall([$this, 'beginTransaction']);
+        $instance->a7AddAfterCall([$this, 'commit']);
+
+        $instance->a7AddExceptionHandling([$this, 'rollback']);
+
         return $instance;
     }
 
-
     public function beginTransaction($className, $methodName)
     {
-        /** @var \A7\Annotations\Transactional $transactional */
-        $transactional = $this->annotationManager->getMethodAnnotation($className, $methodName, 'Transactional');
-        if(!isset($transactional) || $transactional->isEnabled()) {
-            if(isset($this->DBInstance) && method_exists($this->DBInstance, $this->beginTransaction)) {
-                call_user_func([$this->DBInstance, $this->beginTransaction]);
-            }
+        if($this->isTransactional($className, $methodName)) {
+            $this->a7->call($this->DBInstance, $this->beginTransaction, []);
         }
     }
 
     public function commit($className, $methodName)
     {
-        /** @var \A7\Annotations\Transactional $transactional */
-        $transactional = $this->annotationManager->getMethodAnnotation($className, $methodName, 'Transactional');
-        if(!isset($transactional) || $transactional->isEnabled()) {
-            if (isset($this->DBInstance) && method_exists($this->DBInstance, $this->commit)) {
-                call_user_func([$this->DBInstance, $this->commit]);
-            }
+        if($this->isTransactional($className, $methodName)) {
+            $this->a7->call($this->DBInstance, $this->commit, []);
         }
     }
 
     public function rollback($className, $methodName)
     {
-        /** @var \A7\Annotations\Transactional $transactional */
-        $transactional = $this->annotationManager->getMethodAnnotation($className, $methodName, 'Transactional');
-        if(!isset($transactional) || $transactional->isEnabled()) {
-            if (isset($this->DBInstance) && method_exists($this->DBInstance, $this->rollback)) {
-                call_user_func([$this->DBInstance, $this->rollback]);
-            }
+        if($this->isTransactional($className, $methodName)) {
+            $this->a7->call($this->DBInstance, $this->rollback, []);
         }
+    }
+
+    private function isTransactional($className, $methodName)
+    {
+        $isTransactional = false;
+
+        /** @var \A7\Annotations\Transactional|NULL $classTransactional */
+        $classTransactional = $this->annotationManager->getClassAnnotation($className, "Transactional");
+        if(isset($classTransactional)) {
+            $isTransactional = $classTransactional->isEnabled();
+        }
+
+        /** @var \A7\Annotations\Transactional|NULL $methodTransactional */
+        $methodTransactional = $this->annotationManager->getMethodAnnotation($className, $methodName, "Transactional");
+        if(isset($methodTransactional)) {
+            $isTransactional = $methodTransactional->isEnabled();
+        }
+
+        $isTransactional = boolval($isTransactional & isset($this->DBInstance));
+
+        return $isTransactional;
     }
 
 }

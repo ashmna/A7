@@ -15,6 +15,7 @@ class Proxy
     private $a7BeforeCall = [];
     private $a7AfterCall  = [];
     private $a7ExceptionHandling = [];
+    private $a7IsDoPostProcessors = true;
 
     public function __construct(A7Interface $a7, $className, $instance = null)
     {
@@ -120,13 +121,15 @@ class Proxy
     public function a7AddPostProcessor(PostProcessInterface $postProcessor)
     {
         $this->a7PostProcessors[] = $postProcessor;
+        $this->a7IsDoPostProcessors = true;
     }
 
     public function a7DoPostProcessors()
     {
-        if(isset($this->a7Instance) && !empty($this->a7PostProcessors)) {
+        if(isset($this->a7Instance) && $this->a7IsDoPostProcessors) {
             $this->a7Instance = $this->a7->doPostProcessors($this->a7Instance, $this->a7ClassName, $this->a7PostProcessors, $this);
             $this->a7PostProcessors = [];
+            $this->a7IsDoPostProcessors = false;
         }
     }
 

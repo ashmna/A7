@@ -33,7 +33,9 @@ class PostProcessManagerTest extends AbstractUnitTestCase
         // Test Data
         $parameters = [];
         // Run Test
+        /** @var \A7\PostProcessors\SomePostProcess $postProcess */
         $postProcess = $this->postProcessManager->getPostProcessInstance("SomePostProcess", $parameters);
+        $this->assertTrue($postProcess->isInitCalled);
         $this->assertInstanceOf("\\A7\\PostProcessors\\SomePostProcess", $postProcess);
         $this->assertInstanceOf("\\A7\\A7", $this->getMember($postProcess, "a7"));
         $this->assertInstanceOf("\\A7\\AnnotationManager", $this->getMember($postProcess, "annotationManager"));

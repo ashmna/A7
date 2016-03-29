@@ -18,7 +18,7 @@ interface PostProcessManagerInterface
     /**
      * Get post process instance
      *
-     * @param $postProcessName
+     * @param string $postProcessName
      * @param array $parameters
      * @return PostProcessInterface
      */

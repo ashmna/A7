@@ -83,7 +83,7 @@ class AnnotationManager implements AnnotationManagerInterface
     public function getMethodAnnotations($className, $methodName)
     {
         $methodsAnnotations = $this->getMethodsAnnotations($className);
-        return isset($methodsAnnotations[$className]) ? $methodsAnnotations[$className] : [];
+        return isset($methodsAnnotations[$methodName]) ? $methodsAnnotations[$methodName] : [];
     }
 
     public function getMethodAnnotation($className, $methodName, $annotationName)

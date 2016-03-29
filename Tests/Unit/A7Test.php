@@ -258,7 +258,7 @@ class A7Test extends AbstractUnitTestCase
             ->with($className, "Injectable")
             ->willReturn($injectable);
         $this->annotationManager
-            ->expects($this->once())
+            ->expects($this->any())
             ->method("getMethodsAnnotations")
             ->with($className)
             ->willReturn([]);
@@ -500,7 +500,14 @@ class A7Test extends AbstractUnitTestCase
     public function testMethodExistsWithProxy()
     {
         // Test data
-        $proxy = new Proxy($this->a7, "EmptyClass6");
+        $className = "EmptyClass6";
+        $proxy = new Proxy($this->a7, $className);
+        // Expectations
+        $this->annotationManager
+            ->expects($this->once())
+            ->method("getMethodsAnnotations")
+            ->with($className)
+            ->willReturn([]);
         // Run test
         $result = A7::methodExists($proxy, "someMethod");
         $this->assertTrue($result);

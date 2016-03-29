@@ -27,6 +27,7 @@ class PostProcessManager implements PostProcessManagerInterface
     {
         $postProcessClass = "A7\\PostProcessors\\" . $postProcessName;
 
+        /** @var PostProcessInterface $postProcessObject */
         $postProcessObject = new $postProcessClass();
         $postProcessReflectionObject = new \ReflectionObject($postProcessObject);
 
@@ -44,6 +45,8 @@ class PostProcessManager implements PostProcessManagerInterface
                 $a7Property->setValue($postProcessObject, $val);
             }
         }
+
+        $postProcessObject->init();
 
         return $postProcessObject;
     }

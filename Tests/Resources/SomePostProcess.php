@@ -3,15 +3,17 @@
 namespace A7\PostProcessors;
 
 
-use A7\PostProcessInterface;
+use A7\AbstractPostProcess;
 
-class SomePostProcess implements PostProcessInterface
+class SomePostProcess extends AbstractPostProcess
 {
-    private $a7;
-    private $annotationManager;
-    private $parameters;
-
     public static $counter = 0;
+    public $isInitCalled = false;
+
+    public function init()
+    {
+        $this->isInitCalled = true;
+    }
 
     public function postProcessBeforeInitialization($instance, $className)
     {

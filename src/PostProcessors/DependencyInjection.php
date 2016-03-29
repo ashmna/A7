@@ -4,17 +4,10 @@
 namespace A7\PostProcessors;
 
 
-use A7\PostProcessInterface;
-use A7\Proxy;
+use A7\AbstractPostProcess;
 
-class DependencyInjection implements PostProcessInterface
+class DependencyInjection extends AbstractPostProcess
 {
-    /** @var \A7\A7Interface */
-    protected $a7;
-    /** @var \A7\AnnotationManagerInterface */
-    protected $annotationManager;
-    /** @var array */
-    protected $parameters;
 
     public function postProcessBeforeInitialization($instance, $className)
     {
