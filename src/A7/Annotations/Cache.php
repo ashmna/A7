@@ -14,4 +14,10 @@ final class Cache
     public $enable = true;
     public $key;
     public $ttl;
+
+    public function isEnabled()
+    {
+        return $this->enable;
+    }
+
 }

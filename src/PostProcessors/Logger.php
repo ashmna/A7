@@ -4,76 +4,107 @@
 namespace A7\PostProcessors;
 
 
-use A7\PostProcessInterface;
+use A7\AbstractPostProcess;
 use A7\Proxy;
 
-class Logger implements PostProcessInterface
+/**
+ * Class Logger
+ * 
+ * parameters = [
+ *      "namespace" => ""  // if empty logging all
+ *      "file"      => "log-%s.html"
+ *
+ *      "configure" => [
+ *          "default" => [
+ *              "class" => "LoggerAppenderDailyFile"
+ *              "layout" => [
+ *                  "class" => "LoggerLayoutHtml"
+ *              ]
+ *              "params" => [
+ *                  "datePattern" => "Y-m-d"
+ *                  "file"        => "log-%s.html"
+ *              ]
+ *          ]
+ *          "rootLogger" => [
+ *              "appenders" => ["default"],
+ *          ]
+ *      ]
+ * ]
+ *
+ * @package A7\PostProcessors
+ */
+class Logger extends AbstractPostProcess
 {
-
-    private $a7;
-    private $parameters;
-
     /** @var \LoggerRoot */
     private $log;
+    /** @var  string */
+    private $namespace = "";
 
-
-    public function postProcessBeforeInitialization($instance, $className) {
-        if (!isset($this->log)) {
-            if(isset($this->parameters['configure'])) {
-                \Logger::configure($this->parameters['configure']);
-            } else {
-                $file = isset($this->parameters['file']) ? $this->parameters['file'] : 'site-%s.html';
-
-                \Logger::configure([
-                    'appenders'  => [
-                        'default' => [
-                            'class'  => 'LoggerAppenderDailyFile',
-                            'layout' => [
-                                'class' => 'LoggerLayoutHtml',
-                            ],
-                            'params' => [
-                                'datePattern' => 'Y-m-d',
-                                'file'        => $file,
-                            ],
-                        ],
-                    ],
-                    'rootLogger' => [
-                        'appenders' => ['default'],
-                    ],
-                ]);
-            }
-            $this->log = \Logger::getRootLogger();
+    public function init()
+    {
+        if (isset($this->parameters["namespace"])) {
+            $this->namespace = $this->parameters["namespace"];
         }
-        return $instance;
+
+        $configure = [
+            "appenders"  => [
+                "default" => [
+                    "class"  => "LoggerAppenderDailyFile",
+                    "layout" => [
+                        "class" => "LoggerLayoutHtml",
+                    ],
+                    "params" => [
+                        "datePattern" => "Y-m-d",
+                        "file"        => "log-%s.html",
+                    ],
+                ],
+            ],
+            "rootLogger" => [
+                "appenders" => ["default"],
+            ],
+        ];
+
+        if (isset($this->parameters["file"])) {
+            $configure["appenders"]["default"]["params"]["file"] = $this->parameters["file"];
+        }
+
+        if (isset($this->parameters["configure"])) {
+            $configure = $this->parameters["configure"];
+        }
+
+        \Logger::configure($configure);
+
+        $this->log = \Logger::getRootLogger();
     }
 
-    public function postProcessAfterInitialization($instance, $className) {
-        if(!($instance instanceof Proxy)) {
+    public function postProcessAfterInitialization($instance, $className)
+    {
+        if (!($instance instanceof Proxy)) {
             $instance = new Proxy($this->a7, $className, $instance);
         }
-        $ab = true;
-        if(isset($this->parameters['classPath'])){
-            $ab = strpos($className, $this->parameters['classPath']) === 0;
+
+        if (strpos($className, $this->namespace) === 0) {
+            $instance->a7AddBeforeCall([$this, "beforeCall"]);
+            $instance->a7AddAfterCall([$this, "afterCall"]);
         }
 
-        if($ab) {
-            $instance->a7AddBeforeCall([$this, 'beforeCall']);
-            $instance->a7AddAfterCall([$this, 'afterCall']);
-        }
-        $instance->a7AddExceptionHandling([$this, 'exceptionHandling']);
+        $instance->a7AddExceptionHandling([$this, "exceptionHandling"]);
 
         return $instance;
     }
 
-    public function beforeCall($className, $methodName) {
+    public function beforeCall($className, $methodName)
+    {
         $this->log->info("Start $className->$methodName");
     }
 
-    public function afterCall($className, $methodName) {
+    public function afterCall($className, $methodName)
+    {
         $this->log->info("End   $className->$methodName");
     }
 
-    public function exceptionHandling($className, $methodName, $exception) {
+    public function exceptionHandling($className, $methodName, $exception)
+    {
         $this->log->error("$className->$methodName", $exception);
     }
 

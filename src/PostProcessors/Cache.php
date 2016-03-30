@@ -4,59 +4,94 @@
 namespace A7\PostProcessors;
 
 
-use A7\AnnotationManagerInterface;
-use A7\PostProcessInterface;
+use A7\AbstractPostProcess;
 use A7\Proxy;
 
-class Cache implements PostProcessInterface
+class Cache extends AbstractPostProcess
 {
-    /** @var  AnnotationManagerInterface */
-    protected $annotationManager;
-    protected $a7;
+    private $cache = [];
+    private $key = "RT"; // Run Time
 
-
-    protected $cache = [];
-    public function postProcessBeforeInitialization($instance, $className)
+    public function init()
     {
-        return $instance;
+        if (isset($this->parameters["key"])) {
+            $this->key .= "-" . $this->parameters["key"];
+        }
     }
 
     public function postProcessAfterInitialization($instance, $className)
     {
-        /** @var \A7\Annotations\Cache $cache */
-        $cache = $this->annotationManager->getClassAnnotation($className, 'Cache');
-
-        if(isset($cache) && $cache->enable) {
-            if(!($instance instanceof Proxy)) {
-                $instance = new Proxy($this->a7, $className, $instance);
-            }
-
-            $instance->a7AddBeforeCall([$this, 'beforeCall']);
-            $instance->a7AddAfterCall([$this, 'afterCall']);
-
+        if (!($instance instanceof Proxy)) {
+            $instance = new Proxy($this->a7, $className, $instance);
         }
+
+        $instance->a7AddBeforeCall([$this, "beforeCall"]);
+        $instance->a7AddAfterCall([$this, "afterCall"]);
+
         return $instance;
     }
 
     public function beforeCall($arguments, $methodName, $className, &$isCallable, &$result, &$params)
     {
-        $hash = md5(serialize($arguments));
-        $key = "$className-$methodName-$hash";
-        if(isset($this->cache[$key])) {
+        list($isEnabled, $key, $ttl) = $this->checkCache($className, $methodName);
+
+        if (!$isEnabled) {
+            return;
+        }
+
+        if (!isset($key)) {
+            $key = $this->getKey($className, $methodName, $arguments);
+        }
+
+        if (isset($this->cache[$key])) {
             $result = $this->cache[$key];
             $isCallable = false;
         } else {
-            $params['add_to_cache'] = true;
+            $params["Cache.addToCache"] = true;
+            $params["Cache.key"] = $key;
         }
     }
 
-    public function afterCall($arguments, $methodName, $className, &$result, $params)
+    public function afterCall(&$result, $params)
+    {
+        if (!empty($params["Cache.addToCache"])) {
+            $this->cache[$params["Cache.key"]] = $result;
+        }
+    }
+
+    private function getKey($className, $methodName, $arguments)
     {
         $hash = md5(serialize($arguments));
-        $key = "$className-$methodName-$hash";
-        if(!empty($params['add_to_cache'])) {
-            $this->cache[$key] = $result;
+        return $this->key . "-$className-$methodName-$hash";
+    }
+
+    private function checkCache($className, $methodName)
+    {
+        $isEnabled = false;
+        $key = null;
+        $ttl = null;
+
+        /** @var \A7\Annotations\Cache|NULL $classCache */
+        $classCache = $this->annotationManager->getClassAnnotation($className, "Cache");
+        if (isset($classCache)) {
+            $isEnabled = $classCache->isEnabled();
+            $ttl = $classCache->ttl;
         }
+
+        /** @var \A7\Annotations\Cache|NULL $methodCache */
+        $methodCache = $this->annotationManager->getMethodAnnotation($className, $methodName, "Cache");
+        if (isset($methodCache)) {
+            $isEnabled = $methodCache->isEnabled();
+            if ($methodCache->ttl) {
+                $ttl = $methodCache->ttl;
+            };
+            $key = $methodCache->key;
+        }
+
+        $isEnabled &= isset($this->DBInstance);
+        $isEnabled = (bool)$isEnabled;
+
+        return [$isEnabled, $key, $ttl];
     }
 
 }

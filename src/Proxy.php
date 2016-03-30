@@ -3,18 +3,28 @@
 
 namespace A7;
 
+/**
+ * Class Proxy
+ *
+ * @package A7
+ */
 class Proxy
 {
-
     /** @var A7Interface */
     private $a7;
     /** @var PostProcessInterface[] */
     private $a7PostProcessors = [];
+    /** @var object|null */
     private $a7Instance;
+    /** @var string */
     private $a7ClassName;
+    /** @var callable[] */
     private $a7BeforeCall = [];
+    /** @var callable[] */
     private $a7AfterCall  = [];
+    /** @var callable[] */
     private $a7ExceptionHandling = [];
+    /** @var bool */
     private $a7IsDoPostProcessors = true;
 
     public function __construct(A7Interface $a7, $className, $instance = null)
