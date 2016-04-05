@@ -36,4 +36,12 @@ class AbstractPostProcess implements PostProcessInterface
         return $instance;
     }
 
+    protected function getProxy($instance, $className)
+    {
+        if (!($instance instanceof Proxy)) {
+            $instance = new Proxy($this->a7, $className, $instance);
+        }
+        return $instance;
+    }
+
 }

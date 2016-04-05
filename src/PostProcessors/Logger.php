@@ -5,7 +5,6 @@ namespace A7\PostProcessors;
 
 
 use A7\AbstractPostProcess;
-use A7\Proxy;
 
 /**
  * Class Logger
@@ -79,9 +78,7 @@ class Logger extends AbstractPostProcess
 
     public function postProcessAfterInitialization($instance, $className)
     {
-        if (!($instance instanceof Proxy)) {
-            $instance = new Proxy($this->a7, $className, $instance);
-        }
+        $instance = $this->getProxy($instance, $className);
 
         if (strpos($className, $this->namespace) === 0) {
             $instance->a7AddBeforeCall([$this, "beforeCall"]);

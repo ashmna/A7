@@ -5,7 +5,6 @@ namespace A7\PostProcessors;
 
 
 use A7\AbstractPostProcess;
-use A7\Proxy;
 
 class Cache extends AbstractPostProcess
 {
@@ -21,9 +20,7 @@ class Cache extends AbstractPostProcess
 
     public function postProcessAfterInitialization($instance, $className)
     {
-        if (!($instance instanceof Proxy)) {
-            $instance = new Proxy($this->a7, $className, $instance);
-        }
+        $instance = $this->getProxy($instance, $className);
 
         $instance->a7AddBeforeCall([$this, "beforeCall"]);
         $instance->a7AddAfterCall([$this, "afterCall"]);
