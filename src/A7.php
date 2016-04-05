@@ -118,6 +118,37 @@ class A7 implements A7Interface
             unset($this->postProcessors[$postProcessor]);
         }
     }
+    /**
+     * @inheritdoc
+     */
+    public function getRealClassName($class)
+    {
+        $arr = explode("\\", trim($class, "\\"));
+        $name = $arr[count($arr)-1];
+        $class = implode($arr, "\\");
+        if(!class_exists($class)) {
+            $class = $name;
+            array_pop($arr);
+            if(!empty($arr)) {
+                $namespace = implode($arr, "\\");
+                $newClassName = $namespace."\\Impl\\".$name."Impl";
+                if(class_exists($newClassName)) {
+                    $class = $newClassName;
+                } else {
+                    $newClassName = $namespace."\\Impl\\".$name;
+                    if(class_exists($newClassName)) {
+                        $class = $newClassName;
+                    } else {
+                        $newClassName = $namespace."\\".$name."Impl";
+                        if(class_exists($newClassName)) {
+                            $class = $newClassName;
+                        }
+                    }
+                }
+            }
+        }
+        return $class;
+    }
 
     /**
      * @inheritdoc
@@ -208,41 +239,6 @@ class A7 implements A7Interface
             }
         }
         return $callParams;
-    }
-
-    /**
-     * Get real class name
-     *
-     * @param string $class
-     * @return string
-     */
-    private function getRealClassName($class)
-    {
-        $arr = explode("\\", trim($class, "\\"));
-        $name = $arr[count($arr)-1];
-        $class = implode($arr, "\\");
-        if(!class_exists($class)) {
-            $class = $name;
-            array_pop($arr);
-            if(!empty($arr)) {
-                $namespace = implode($arr, "\\");
-                $newClassName = $namespace."\\Impl\\".$name."Impl";
-                if(class_exists($newClassName)) {
-                    $class = $newClassName;
-                } else {
-                    $newClassName = $namespace."\\Impl\\".$name;
-                    if(class_exists($newClassName)) {
-                        $class = $newClassName;
-                    } else {
-                        $newClassName = $namespace."\\".$name."Impl";
-                        if(class_exists($newClassName)) {
-                            $class = $newClassName;
-                        }
-                    }
-                }
-            }
-        }
-        return $class;
     }
 
     /**

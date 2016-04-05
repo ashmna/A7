@@ -43,6 +43,14 @@ interface A7Interface
     function disablePostProcessor($postProcessor);
 
     /**
+     * Get real class name
+     *
+     * @param string $class
+     * @return string
+     */
+    function getRealClassName($class);
+
+    /**
      * Initialization class
      *
      * @param string $class
