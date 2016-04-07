@@ -33,7 +33,7 @@ class Transaction extends AbstractPostProcess
     {
         $this->DBInstance = null;
 
-        if(isset($this->parameters['instance']) && is_object($this->parameters['instance'])) {
+        if (isset($this->parameters['instance']) && is_object($this->parameters['instance'])) {
             $this->DBInstance = $this->parameters['instance'];
         } elseif (isset($this->parameters['class'])) {
             $this->DBInstance = $this->a7->get($this->parameters['class']);
@@ -43,16 +43,16 @@ class Transaction extends AbstractPostProcess
         $this->commit           = 'commit';
         $this->rollback         = 'rollback';
 
-        if(isset($this->parameters['beginTransaction'])) {
-            $this->beginTransaction = $this->parameters['beginTransaction'];
+        if (isset($this->parameters['beginTransaction'])) {
+            $this->beginTransaction = (string)$this->parameters['beginTransaction'];
         }
 
-        if(isset($this->parameters['commit'])) {
-            $this->commit = $this->parameters['commit'];
+        if (isset($this->parameters['commit'])) {
+            $this->commit = (string)$this->parameters['commit'];
         }
 
-        if(isset($this->parameters['rollback'])) {
-            $this->rollback = $this->parameters['rollback'];
+        if (isset($this->parameters['rollback'])) {
+            $this->rollback = (string)$this->parameters['rollback'];
         }
     }
 
