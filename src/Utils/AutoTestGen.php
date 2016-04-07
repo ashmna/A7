@@ -10,7 +10,7 @@ class AutoTestGen
      * @param string $path
      * @return int
      */
-    public static function saveCallRecord($records, $path)
+    public static function saveCallRecords($records, $path)
     {
         $data  = self::getDataFromFile($path);
 
