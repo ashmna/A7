@@ -6,6 +6,8 @@ namespace A7\Utils;
 class AutoTestGen
 {
     /**
+     * Save call records
+     *
      * @param CallRecord[] $records
      * @param string $path
      * @return int
@@ -30,50 +32,33 @@ class AutoTestGen
         return self::saveData($data, $path);
     }
 
-
+    /**
+     * Generate
+     *
+     * @param string $dataFilePath
+     * @param string $path
+     * @param string $namespacePrefix
+     * @param string $type
+     */
     public static function generate($dataFilePath, $path, $namespacePrefix, $type) {
-        $data = self::getDataFromFile($dataFilePath);
+        $data = self::formattingDataPerClass(self::getDataFromFile($dataFilePath), $type);
 
-        $perClass = [];
-        foreach ($data as $c => $data1) {
-            $perClass[$c] = [
-                "content" => [],
-                "useList" => []
-            ];
-            foreach($data1[$type] as $item) {
-                $perClass[$c]["content"][] = $item[1];
-                $perClass[$c]["useList"] = array_merge($perClass[$c]["useList"], $item[0]);
-            }
-        }
+        foreach($data as $class => $row) {
+            list($testFileName, $classPath, $namespace) = self::formatClassNames($class, $path);
 
-        foreach($perClass as $class => $row) {
-            $classPath = $path.str_replace("\\", "/", $class);
-            $testFileName = basename($classPath). "Test";
-            $classPath = dirname($classPath). DIRECTORY_SEPARATOR . $testFileName.".php";
-            if(!file_exists(dirname($classPath))) {
-                mkdir(dirname($classPath), 0777, true);
-            }
-            $namespace = str_replace("/", "\\", dirname(str_replace("\\", "/", $class)));
+            $row["useList"][] = "A7\\Tests\\Resources\\AbstractUnitTestCase";
 
-            $testClassContent = "<?php\n";
+            self::createDirs($classPath);
+            $content = self::generateClassFile(
+                $namespacePrefix."\\".$namespace,
+                $row["useList"],
+                $testFileName,
+                $row["content"]
+            );
 
-            $testClassContent .= "namespace {$namespacePrefix}\\{$namespace};\n";
-
-            $testClassContent .= "\n";
-            foreach(array_unique($row["useList"]) as $use) {
-                $testClassContent .= "use {$use};\n";
-            }
-            $testClassContent .= "use A7\\Tests\\Resources\\AbstractUnitTestCase;\n";
-            $testClassContent .= "\n\n";
-
-            $testClassContent .= "class {$testFileName} extends AbstractUnitTestCase \n{\n\n";
-            $testClassContent .= implode("\n", $row["content"]);
-            $testClassContent .= "\n}\n";
-
-            file_put_contents($classPath, $testClassContent);
+            file_put_contents($classPath, $content);
         }
     }
-
 
      /**
      * Get data from file
@@ -102,6 +87,90 @@ class AutoTestGen
     {
         $content = "<?php return ".var_export($data, true)."; ";
         return file_put_contents($path, $content);
+    }
+
+    /**
+     * Formatting data per class
+     *
+     * @param array $data
+     * @param string $type
+     * @return array
+     */
+    private static function formattingDataPerClass(array $data, $type)
+    {
+        $perClass = [];
+        foreach ($data as $c => $data1) {
+            $perClass[$c] = [
+                "content" => [],
+                "useList" => []
+            ];
+            foreach($data1[$type] as $item) {
+                $perClass[$c]["content"][] = $item[1];
+                $perClass[$c]["useList"] = array_merge($perClass[$c]["useList"], $item[0]);
+            }
+        }
+        return $perClass;
+    }
+
+    /**
+     * Format class names
+     *
+     * @param string $class
+     * @param string $path
+     * @return string[3]
+     */
+    private static function formatClassNames($class, $path)
+    {
+        $classPath = $path.str_replace("\\", "/", $class);
+        $testFileName = basename($classPath). "Test";
+        $classPath = dirname($classPath). DIRECTORY_SEPARATOR . $testFileName.".php";
+        $namespace = str_replace("/", "\\", dirname(str_replace("\\", "/", $class)));
+
+        return [$testFileName, $classPath, $namespace];
+    }
+
+    /**
+     * Attempts to create the directory specified by pathname.
+     *
+     * @param $path
+     */
+    private static function createDirs($path)
+    {
+        if(!file_exists(dirname($path))) {
+            mkdir(dirname($path), 0777, true);
+        }
+    }
+
+    /**
+     * Generate class file
+     *
+     * @param string $namespace
+     * @param string[] $useList
+     * @param string $className
+     * @param string[] $contentData
+     * @return string
+     */
+    private static function generateClassFile($namespace, $useList, $className, $contentData)
+    {
+        $c = [];
+
+        $c[] = "<?php";
+        $c[] = "";
+        $c[] = "namespace {$namespace};";
+        $c[] = "";
+        $c[] = "";
+        foreach(array_unique($useList) as $use) {
+            $c[] =  "use {$use};\n";
+        }
+        $c[] = "";
+        $c[] = "";
+        $c[] = "";
+        $c[] = "class {$className} extends AbstractUnitTestCase";
+        $c[] = "{";
+        $c[] = implode("\n", $contentData);
+        $c[] = "}";
+
+        return implode("\n", $c);
     }
 
 }
