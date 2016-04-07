@@ -323,7 +323,6 @@ class CallRecord
         switch($data) {
             case is_null($data):
                 return "\$this->assertNull(\${$name});";
-                break;
             case is_object($data):
                 return "\$this->assertInstanceOf({$this->s(get_class($data))}, \${$name});";
             case $data === true:
