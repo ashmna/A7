@@ -270,10 +270,10 @@ class CallRecord
         $c[] = "// Expectations";
 
         foreach ($this->children as $child) {
-            $c[] = "\$mock{$child->testObjName}->expects(\$this->once())\n";
-            $c[] = "{$t}->method(\"{$child->methodName}\")\n";
-            // $c[] = "{$t}->with(\"{$child->methodName}\")\n";
-            $c[] = "{$t}->willReturn(\$mockResult{$child->testObjName});\n";
+            $c[] = "\$mock{$child->testObjName}->expects(\$this->once())";
+            $c[] = "{$t}->method(\"{$child->methodName}\")";
+            // $c[] = "{$t}->with(\"{$child->methodName}\")";
+            $c[] = "{$t}->willReturn(\$mockResult{$child->testObjName});";
         }
 
         return self::addTabs($c, $t);
