@@ -239,7 +239,7 @@ class CallRecord
         }
 
         foreach ($mocks as $name => $mock) {
-            $mockMethods = "\"" . implode(", ", $mock["methods"]) . "\"";
+            $mockMethods = implode(", ", $mock["methods"]);
 
             $c[] = "\$mock{$name} = \$this->getMockBuilder({$this->s($mock["class"], $t)})";
             $c[] = "{$t}->setMethods([{$mockMethods}])";

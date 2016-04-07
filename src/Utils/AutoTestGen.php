@@ -25,8 +25,8 @@ class AutoTestGen
                 ];
             }
 
-            $data[$className]['Unit'][$record->getKey()] = [$record->getUseList(), $record->getRecordAsUnitTestFunction()];
-            $data[$className]['Integration'][$record->getKey()] = [$record->getUseList(), $record->getRecordAsIntegrationTestFunction()];
+            $data[$className]['Unit'][$record->getKey()] = [$record->getRecordAsUnitTestFunction(), $record->getUseList()];
+            $data[$className]['Integration'][$record->getKey()] = [$record->getRecordAsIntegrationTestFunction(), $record->getUseList()];
         }
 
         return self::saveData($data, $path);
@@ -40,7 +40,8 @@ class AutoTestGen
      * @param string $namespacePrefix
      * @param string $type
      */
-    public static function generate($dataFilePath, $path, $namespacePrefix, $type) {
+    public static function generate($dataFilePath, $path, $namespacePrefix, $type)
+    {
         $data = self::formattingDataPerClass(self::getDataFromFile($dataFilePath), $type);
 
         foreach($data as $class => $row) {
@@ -105,8 +106,8 @@ class AutoTestGen
                 "useList" => []
             ];
             foreach($data1[$type] as $item) {
-                $perClass[$c]["content"][] = $item[1];
-                $perClass[$c]["useList"] = array_merge($perClass[$c]["useList"], $item[0]);
+                $perClass[$c]["content"][] = $item[0];
+                $perClass[$c]["useList"] = array_merge($perClass[$c]["useList"], $item[1]);
             }
         }
         return $perClass;
@@ -160,9 +161,8 @@ class AutoTestGen
         $c[] = "";
         $c[] = "";
         foreach(array_unique($useList) as $use) {
-            $c[] =  "use {$use};\n";
+            $c[] =  "use {$use};";
         }
-        $c[] = "";
         $c[] = "";
         $c[] = "";
         $c[] = "class {$className} extends AbstractUnitTestCase";

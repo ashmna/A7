@@ -18,11 +18,11 @@ class Proxy
     private $a7Instance;
     /** @var string */
     private $a7ClassName;
-    /** @var callable[] */
+    /** @var array */
     private $a7BeforeCall = [];
-    /** @var callable[] */
+    /** @var array */
     private $a7AfterCall  = [];
-    /** @var callable[] */
+    /** @var array */
     private $a7ExceptionHandling = [];
     /** @var bool */
     private $a7IsDoPostProcessors = true;
