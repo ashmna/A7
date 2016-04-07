@@ -36,7 +36,7 @@ class CallRecord
     /** @var string */
     private $testClassName;
 
-    const T = "    ";
+    const T = "    "; // tab = 4 space
 
     /**
      * CallRecord constructor.
@@ -307,29 +307,21 @@ class CallRecord
     {
         $c = [];
 
-        $genEquals = true;
-        if (is_null($data)) {
-            $c[] = "\$this->assertNull(\${$name});";
-            $genEquals = false;
-        } elseif (is_object($data)) {
-            $c[] = "\$this->assertInstanceOf({$this->s(get_class($data))}, \${$name});";
-            $genEquals = false;
-        } elseif (is_array($data)) {
-            foreach ($data as $value) {
-                $genEquals &= !is_object($value);
-                if (!$genEquals) {
-                    break;
-                }
-            }
-            if (!$genEquals) {
-                foreach ($data as $key => $value) {
-                    $c = array_merge($c, $this->generateAssertions($value, $name . "[\"{$key}\"]", $t));
-                }
+        if(is_array($data)) {
+            foreach ($data as $key => $value) {
+                $c = array_merge($c, $this->generateAssertions($value, $name . "[\"{$key}\"]", $t));
             }
         }
 
-        if ($genEquals) {
-            $c[] = "\$this->assertEquals({$this->s($data, $t)}, \${$name});";
+        switch($data) {
+            case is_null($data):
+                $c[] = "\$this->assertNull(\${$name});";
+                break;
+            case is_object($data):
+                $c[] = "\$this->assertInstanceOf({$this->s(get_class($data))}, \${$name});";
+                break;
+            default:
+                $c[] = "\$this->assertEquals({$this->s($data, $t)}, \${$name});";
         }
 
         return self::addTabs($c, $t);
