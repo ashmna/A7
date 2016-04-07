@@ -313,24 +313,26 @@ class CallRecord
             }
         }
 
-        switch($data) {
-            case is_null($data):
-                $c[] = "\$this->assertNull(\${$name});";
-                break;
-            case is_object($data):
-                $c[] = "\$this->assertInstanceOf({$this->s(get_class($data))}, \${$name});";
-                break;
-            case $data === true:
-                $c[] = "\$this->assertTrue(\${$name});";
-                break;
-            case $data === false:
-                $c[] = "\$this->assertFalse(\${$name});";
-                break;
-            default:
-                $c[] = "\$this->assertEquals({$this->s($data, $t)}, \${$name});";
-        }
+        $c[] = $this->generateAssertionByType($data, $name, $t);
 
         return self::addTabs($c, $t);
+    }
+
+    private function generateAssertionByType($data, $name, $t)
+    {
+        switch($data) {
+            case is_null($data):
+                return "\$this->assertNull(\${$name});";
+                break;
+            case is_object($data):
+                return "\$this->assertInstanceOf({$this->s(get_class($data))}, \${$name});";
+            case $data === true:
+                return "\$this->assertTrue(\${$name});";
+            case $data === false:
+                return "\$this->assertFalse(\${$name});";
+            default:
+                return "\$this->assertEquals({$this->s($data, $t)}, \${$name});";
+        }
     }
 
     private static function addTabs($arr, $t)
