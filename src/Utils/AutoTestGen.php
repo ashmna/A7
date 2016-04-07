@@ -118,7 +118,7 @@ class AutoTestGen
      *
      * @param string $class
      * @param string $path
-     * @return string[3]
+     * @return string[]
      */
     private static function formatClassNames($class, $path)
     {
