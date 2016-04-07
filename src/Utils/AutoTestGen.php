@@ -159,7 +159,6 @@ class AutoTestGen
         $c[] = "";
         $c[] = "namespace {$namespace};";
         $c[] = "";
-        $c[] = "";
         foreach(array_unique($useList) as $use) {
             $c[] =  "use {$use};";
         }
@@ -167,8 +166,10 @@ class AutoTestGen
         $c[] = "";
         $c[] = "class {$className} extends AbstractUnitTestCase";
         $c[] = "{";
+        $c[] = "";
         $c[] = implode("\n", $contentData);
         $c[] = "}";
+        $c[] = "";
 
         return implode("\n", $c);
     }

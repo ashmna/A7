@@ -320,6 +320,12 @@ class CallRecord
             case is_object($data):
                 $c[] = "\$this->assertInstanceOf({$this->s(get_class($data))}, \${$name});";
                 break;
+            case $data === true:
+                $c[] = "\$this->assertTrue(\${$name});";
+                break;
+            case $data === false:
+                $c[] = "\$this->assertFalse(\${$name});";
+                break;
             default:
                 $c[] = "\$this->assertEquals({$this->s($data, $t)}, \${$name});";
         }
