@@ -35,6 +35,8 @@ class CallRecord
     private $testObjName;
     /** @var string */
     private $testClassName;
+    /** @var bool */
+    private $skipExpectation = false;
 
     const T = "    "; // tab = 4 space
 
@@ -115,7 +117,7 @@ class CallRecord
 
     public function getUseList()
     {
-        return $this->useList;
+        return array_unique($this->useList);
     }
 
     public function getRecordAsUnitTestFunction()
@@ -154,6 +156,9 @@ class CallRecord
 
     private function toTestFunction()
     {
+        $this->argumentsNames = [];
+        $this->useList = [];
+
         $this->genTestObjNames();
 
         $c = $this->generateTest(self::T);
@@ -164,8 +169,6 @@ class CallRecord
 
     private function genTestObjNames()
     {
-        $this->useList = [];
-
         $this->testObjName = lcfirst(self::shortClassName($this->className));
         foreach($this->children as $child) {
             $child->testObjName = self::shortClassName($child->className);
@@ -202,16 +205,16 @@ class CallRecord
         $c[] = "\${$this->testObjName} = new {$this->testClassName}();";
 
         foreach($this->injectPropertyValues as $propertyName => $propertyValue) {
-            $c[] = "\$this->setMock(\${$this->testObjName}, \"{$propertyName}\", {$this->s($propertyValue, $t)});";
+            $c[] = "\$this->setMock(\${$this->testObjName}, \"{$propertyName}\", {$this->s($propertyValue)});";
         }
 
         foreach (ReflectionUtils::getInstance()->getParametersReflection($this->className, $this->methodName) as $i => $parameter) {
             $this->argumentsNames[] = "\${$parameter->name}";
-            $c[] = "\${$parameter->name} = {$this->s($this->arguments[$i], $t)};";
+            $c[] = "\${$parameter->name} = {$this->s($this->arguments[$i])};";
         }
 
         foreach ($this->children as $child) {
-            $c[] = "\$mockResult{$child->testObjName} = {$this->s($child->result, $t)};";
+            $c[] = "\$mockResult{$child->testObjName} = {$this->s($child->result)};";
         }
 
         return self::addTabs($c, $t);
@@ -226,37 +229,45 @@ class CallRecord
         }
 
         $c[] = "// Mocks";
-        $mocks = [];
-
-        foreach ($this->children as $child) {
-            if (!isset($mocks[$child->testObjName])) {
-                $mocks[$child->testObjName] = array(
-                    "class"   => "\\" . $child->className,
-                    "methods" => [],
-                );
-            }
-            $mocks[$child->testObjName]['methods'][] = "\"{$child->methodName}\"";
-        }
+        $mocks = $this->childrenToMoks();
 
         foreach ($mocks as $name => $mock) {
             $mockMethods = implode(", ", $mock["methods"]);
 
-            $c[] = "\$mock{$name} = \$this->getMockBuilder({$this->s($mock["class"], $t)})";
+            $c[] = "\$mock{$name} = \$this->getMockBuilder({$this->s($mock["class"])})";
             $c[] = "{$t}->setMethods([{$mockMethods}])";
             $c[] = "{$t}->getMock();";
         }
 
         foreach ($mocks as $name => $mock) {
-            if (!isset($this->injectClassToPropertyName[$mock["class"]])) {
-                continue;
-            }
-
-            $property = $this->injectClassToPropertyName[$mock["class"]];
-
-            $c[] = "\$this->setMock(\${$this->testObjName}, \"{$property}\", \$mock{$name});";
+            $c[] = "\$this->setMock(\${$this->testObjName}, \"{$mock["property"]}\", \$mock{$name});";
         }
 
         return self::addTabs($c, $t);
+    }
+
+    private function childrenToMoks()
+    {
+        $mocks = [];
+        foreach ($this->children as $child) {
+            $className = "\\" . $child->className;
+                
+            if (!isset($this->injectClassToPropertyName[$className])) {
+                $child->skipExpectation = true;
+                continue;
+            }
+
+            if (!isset($mocks[$child->testObjName])) {
+                $mocks[$child->testObjName] = array(
+                    "class"   => $className,
+                    "methods" => [],
+                    "property" => $this->injectClassToPropertyName[$className],
+                );
+            }
+
+            $mocks[$child->testObjName]['methods'][] = "\"{$child->methodName}\"";
+        }
+        return $mocks;
     }
 
     private function generateExpectations($t)
@@ -270,6 +281,9 @@ class CallRecord
         $c[] = "// Expectations";
 
         foreach ($this->children as $child) {
+            if($child->skipExpectation) {
+                continue;
+            }
             $c[] = "\$mock{$child->testObjName}->expects(\$this->once())";
             $c[] = "{$t}->method(\"{$child->methodName}\")";
             // $c[] = "{$t}->with(\"{$child->methodName}\")";
@@ -282,7 +296,7 @@ class CallRecord
     private function generateRun($t)
     {
         $c = [];
-        $ars = implode($this->argumentsNames);
+        $ars = implode(", ",$this->argumentsNames);
 
         if(empty($this->exception)) {
             $c[] = "// Run Test";
@@ -320,7 +334,7 @@ class CallRecord
 
     private function generateAssertionByType($data, $name, $t)
     {
-        switch($data) {
+        switch(true) {
             case is_null($data):
                 return "\$this->assertNull(\${$name});";
             case is_object($data):
@@ -332,7 +346,7 @@ class CallRecord
             case $data === false:
                 return "\$this->assertFalse(\${$name});";
             default:
-                return "\$this->assertEquals({$this->s($data, $t)}, \${$name});";
+                return "\$this->assertEquals({$this->s($data)}, \${$name});";
         }
     }
 
@@ -345,9 +359,9 @@ class CallRecord
         return $arr;
     }
 
-    private function s($data, $tabs = "")
+    private function s($data)
     {
-        return str_replace("\n", "\n{$tabs}", var_export($data, true));
+        return var_export($data, true);
     }
 
     private static function shortClassName($className)

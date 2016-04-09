@@ -52,9 +52,8 @@ class AutoTest extends AbstractPostProcess
         $length = count($this->callStack);
         if ($length) {
             $this->callStack[$length - 1]->setChild($record);
-        } else {
-            $this->callStack[] = $record;
         }
+        $this->callStack[] = $record;
     }
 
     public function after($result)
