@@ -307,13 +307,13 @@ class CallRecord
     {
         $c = [];
 
-        if(is_array($data)) {
+        if(is_array($data) && !empty($data)) {
             foreach ($data as $key => $value) {
                 $c = array_merge($c, $this->generateAssertions($value, $name . "[\"{$key}\"]", $t));
             }
+        } else {
+            $c[] = $this->generateAssertionByType($data, $name, $t);
         }
-
-        $c[] = $this->generateAssertionByType($data, $name, $t);
 
         return self::addTabs($c, $t);
     }
@@ -325,6 +325,8 @@ class CallRecord
                 return "\$this->assertNull(\${$name});";
             case is_object($data):
                 return "\$this->assertInstanceOf({$this->s(get_class($data))}, \${$name});";
+            case is_array($data):
+                return "\$this->assertInternalType(\"array\", \${$name});";
             case $data === true:
                 return "\$this->assertTrue(\${$name});";
             case $data === false:
@@ -337,6 +339,7 @@ class CallRecord
     private static function addTabs($arr, $t)
     {
         foreach($arr as &$row) {
+            $row = str_replace("\n", "\n{$t}", $row);
             $row = $t.$row;
         }
         return $arr;
@@ -344,7 +347,7 @@ class CallRecord
 
     private function s($data, $tabs = "")
     {
-        return str_replace("\n", "{$tabs}\n", var_export($data, true));
+        return str_replace("\n", "\n{$tabs}", var_export($data, true));
     }
 
     private static function shortClassName($className)
