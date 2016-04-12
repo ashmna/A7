@@ -4,7 +4,7 @@
 namespace A7\Annotations;
 
 /**
- * "Injectable" Cache
+ * "Cache" annotation
  *
  * @Annotation
  * @package A7\Annotations
