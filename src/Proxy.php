@@ -21,7 +21,7 @@ class Proxy
     /** @var array */
     private $a7BeforeCall = [];
     /** @var array */
-    private $a7AfterCall  = [];
+    private $a7AfterCall = [];
     /** @var array */
     private $a7ExceptionHandling = [];
     /** @var bool */
@@ -31,14 +31,14 @@ class Proxy
     {
         $this->a7 = $a7;
         $this->a7ClassName = $className;
-        $this->a7Instance  = $instance;
+        $this->a7Instance = $instance;
     }
 
     public function __call($methodName, array $arguments = [])
     {
         $this->a7Init();
 
-        if(!method_exists($this->a7Instance, $methodName)) {
+        if (!method_exists($this->a7Instance, $methodName)) {
             throw new \RuntimeException($this->a7ClassName."::".$methodName."() method not exists");
         }
 
@@ -48,8 +48,7 @@ class Proxy
     public function __get($name)
     {
         $this->a7Init();
-        if(property_exists($this->a7Instance, $name)
-            && ReflectionUtils::getInstance()->getPropertyReflection($this->a7ClassName, $name)->isPublic()) {
+        if (property_exists($this->a7Instance, $name) && ReflectionUtils::getInstance()->getPropertyReflection($this->a7ClassName, $name)->isPublic()) {
             return $this->a7Instance->{$name};
         } else {
             throw new \RuntimeException($this->a7ClassName."::\${$name} [get] property not exists");
@@ -59,8 +58,7 @@ class Proxy
     public function __set($name, $value)
     {
         $this->a7Init();
-        if(property_exists($this->a7Instance, $name)
-            && ReflectionUtils::getInstance()->getPropertyReflection($this->a7ClassName, $name)->isPublic()) {
+        if (property_exists($this->a7Instance, $name) && ReflectionUtils::getInstance()->getPropertyReflection($this->a7ClassName, $name)->isPublic()) {
             $this->a7Instance->{$name} = $value;
         } else {
             throw new \RuntimeException($this->a7ClassName."::\${$name} [set] property not exists");
@@ -69,21 +67,21 @@ class Proxy
 
     public function a7AddBeforeCall($beforeCallFunction)
     {
-        if(is_callable($beforeCallFunction)) {
+        if (is_callable($beforeCallFunction)) {
             $this->a7BeforeCall[] = $beforeCallFunction;
         }
     }
 
     public function a7AddAfterCall($afterCallFunction)
     {
-        if(is_callable($afterCallFunction)) {
+        if (is_callable($afterCallFunction)) {
             $this->a7AfterCall[] = $afterCallFunction;
         }
     }
 
     public function a7AddExceptionHandling($exceptionHandling)
     {
-        if(is_callable($exceptionHandling)) {
+        if (is_callable($exceptionHandling)) {
             $this->a7ExceptionHandling[] = $exceptionHandling;
         }
     }
@@ -96,7 +94,7 @@ class Proxy
 
     public function a7DoPostProcessors()
     {
-        if(isset($this->a7Instance) && $this->a7IsDoPostProcessors) {
+        if (isset($this->a7Instance) && $this->a7IsDoPostProcessors) {
             $this->a7Instance = $this->a7->doPostProcessors($this->a7Instance, $this->a7ClassName, $this->a7PostProcessors, $this);
             $this->a7PostProcessors = [];
             $this->a7IsDoPostProcessors = false;
@@ -124,15 +122,15 @@ class Proxy
         $this->a7CallHandles("a7BeforeCall", $params);
 
         try {
-            if($isCallable) {
+            if ($isCallable) {
                 $result = call_user_func_array([$this->a7Instance, $methodName], $arguments);
             }
-        } catch(\Exception $exception) {
+        } catch (\Exception $exception) {
             $params["exception"] = &$exception;
 
             $this->a7CallHandles("a7ExceptionHandling", $params);
 
-            if($isThrowable) {
+            if ($isThrowable) {
                 throw $exception;
             }
         }
@@ -159,20 +157,20 @@ class Proxy
 
     private function a7CallHandles($name, &$params)
     {
-        foreach($this->$name as $item) {
+        foreach ($this->$name as $item) {
             $this->a7Call($item, $params);
         }
     }
 
     private function a7Init()
     {
-        if(!isset($this->a7Instance)) {
+        if (!isset($this->a7Instance)) {
             $this->a7Instance = $this->a7->initClass($this->a7ClassName, true);
         }
         $this->a7DoPostProcessors();
     }
 
-    private function a7Call(array $callArr, array $params=[])
+    private function a7Call(array $callArr, array $params = [])
     {
         list($callClass, $callMethodName) = $callArr;
         $this->a7->call($callClass, $callMethodName, $params);
