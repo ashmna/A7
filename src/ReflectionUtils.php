@@ -17,7 +17,7 @@ class ReflectionUtils implements ReflectionUtilsInterface
      * @return ReflectionUtilsInterface
      */
     public static function getInstance() {
-        if (null === static::$instance) {
+        if (null === self::$instance) {
             self::$instance = new self();
         }
 
