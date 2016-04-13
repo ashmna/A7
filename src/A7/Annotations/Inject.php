@@ -13,7 +13,6 @@ final class Inject
 {
 
     private $name;
-    private $parameters = [];
 
     /**
      * @param array $values
