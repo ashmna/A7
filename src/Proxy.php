@@ -119,43 +119,49 @@ class Proxy
         $isCallable = true;
         $isThrowable = true;
         $result = null;
-        $transferParams = [];
-        $params = [
-            "object"     => &$this->a7Instance,
-            "className"  => &$this->a7ClassName,
-            "methodName" => &$methodName,
-            "arguments"  => &$arguments,
-            "result"     => &$result,
-            "params"     => &$transferParams,
-            "isCallable" => &$isCallable,
-        ];
+        $params = $this->a7InitParams($isCallable, $isThrowable, $methodName, $arguments, $result);
 
-        foreach($this->a7BeforeCall as $beforeCall) {
-            $this->a7Call($beforeCall, $params);
-        }
+        $this->a7CallHandles("a7BeforeCall", $params);
 
         try {
             if($isCallable) {
                 $result = call_user_func_array([$this->a7Instance, $methodName], $arguments);
             }
         } catch(\Exception $exception) {
-            $params["isThrowable"] = &$isThrowable;
-            $params["exception"]   = &$exception;
+            $params["exception"] = &$exception;
 
-            foreach($this->a7ExceptionHandling as $exceptionHandling) {
-                $this->a7Call($exceptionHandling, $params);
-            }
+            $this->a7CallHandles("a7ExceptionHandling", $params);
 
             if($isThrowable) {
                 throw $exception;
             }
         }
 
-        foreach($this->a7AfterCall as $afterCall) {
-            $this->a7Call($afterCall, $params);
-        }
+        $this->a7CallHandles("a7AfterCall", $params);
 
         return $result;
+    }
+
+    private function a7InitParams(&$isCallable, &$isThrowable, &$methodName, array &$arguments, &$result)
+    {
+        $transferParams = [];
+        return [
+            "object"      => &$this->a7Instance,
+            "className"   => &$this->a7ClassName,
+            "methodName"  => &$methodName,
+            "arguments"   => &$arguments,
+            "result"      => &$result,
+            "params"      => &$transferParams,
+            "isCallable"  => &$isCallable,
+            "isThrowable" => &$isThrowable
+        ];
+    }
+
+    private function a7CallHandles($name, &$params)
+    {
+        foreach($this->$name as $item) {
+            $this->a7Call($item, $params);
+        }
     }
 
     private function a7Init()
