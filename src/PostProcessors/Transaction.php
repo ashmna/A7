@@ -23,25 +23,23 @@ class Transaction extends AbstractPostProcess
     /** @var \stdClass|NULL */
     private $DBInstance;
     /** @var string */
-    private $beginTransaction;
+    private $beginTransaction = "beginTransaction";
     /** @var string */
-    private $commit;
+    private $commit = "commit";
     /** @var string */
-    private $rollback;
+    private $rollback = "rollback";
 
     public function init()
     {
         $this->DBInstance = null;
 
-        if (isset($this->parameters['instance']) && is_object($this->parameters['instance'])) {
-            $this->DBInstance = $this->parameters['instance'];
-        } elseif (isset($this->parameters['class'])) {
+        if (isset($this->parameters['class'])) {
             $this->DBInstance = $this->a7->get($this->parameters['class']);
         }
 
-        $this->beginTransaction = 'beginTransaction';
-        $this->commit           = 'commit';
-        $this->rollback         = 'rollback';
+        if (isset($this->parameters['instance'])) {
+            $this->DBInstance = $this->parameters['instance'];
+        }
 
         if (isset($this->parameters['beginTransaction'])) {
             $this->beginTransaction = (string)$this->parameters['beginTransaction'];

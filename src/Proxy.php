@@ -38,51 +38,11 @@ class Proxy
     {
         $this->a7Init();
 
-        if(method_exists($this->a7Instance, $methodName)) {
-            $isCallable = true;
-            $isThrowable = true;
-            $result = null;
-            $transferParams = [];
-            $params = [
-                "object"     => &$this->a7Instance,
-                "className"  => &$this->a7ClassName,
-                "methodName" => &$methodName,
-                "arguments"  => &$arguments,
-                "result"     => &$result,
-                "params"     => &$transferParams,
-                "isCallable" => &$isCallable,
-            ];
-
-
-            foreach($this->a7BeforeCall as $beforeCall) {
-                $this->a7Call($beforeCall, $params);
-            }
-
-            try {
-                if($isCallable) {
-                    $result = call_user_func_array([$this->a7Instance, $methodName], $arguments);
-                }
-            } catch(\Exception $exception) {
-                $params["isThrowable"] = &$isThrowable;
-                $params["exception"]   = &$exception;
-
-                foreach($this->a7ExceptionHandling as $exceptionHandling) {
-                    $this->a7Call($exceptionHandling, $params);
-                }
-
-                if($isThrowable) {
-                    throw $exception;
-                }
-            }
-
-            foreach($this->a7AfterCall as $afterCall) {
-                $this->a7Call($afterCall, $params);
-            }
-
-            return $result;
-        } else {
+        if(!method_exists($this->a7Instance, $methodName)) {
             throw new \RuntimeException($this->a7ClassName."::".$methodName."() method not exists");
         }
+
+        return $this->a7CallMethod($methodName, $arguments);
     }
 
     public function __get($name)
@@ -152,6 +112,50 @@ class Proxy
     public function a7getClass()
     {
         return $this->a7ClassName;
+    }
+
+    private function a7CallMethod($methodName, array $arguments)
+    {
+        $isCallable = true;
+        $isThrowable = true;
+        $result = null;
+        $transferParams = [];
+        $params = [
+            "object"     => &$this->a7Instance,
+            "className"  => &$this->a7ClassName,
+            "methodName" => &$methodName,
+            "arguments"  => &$arguments,
+            "result"     => &$result,
+            "params"     => &$transferParams,
+            "isCallable" => &$isCallable,
+        ];
+
+        foreach($this->a7BeforeCall as $beforeCall) {
+            $this->a7Call($beforeCall, $params);
+        }
+
+        try {
+            if($isCallable) {
+                $result = call_user_func_array([$this->a7Instance, $methodName], $arguments);
+            }
+        } catch(\Exception $exception) {
+            $params["isThrowable"] = &$isThrowable;
+            $params["exception"]   = &$exception;
+
+            foreach($this->a7ExceptionHandling as $exceptionHandling) {
+                $this->a7Call($exceptionHandling, $params);
+            }
+
+            if($isThrowable) {
+                throw $exception;
+            }
+        }
+
+        foreach($this->a7AfterCall as $afterCall) {
+            $this->a7Call($afterCall, $params);
+        }
+
+        return $result;
     }
 
     private function a7Init()

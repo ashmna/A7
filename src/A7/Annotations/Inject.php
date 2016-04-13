@@ -35,18 +35,6 @@ final class Inject
         if (is_string($values)) {
             $this->name = $values;
         }
-        // @Inject({...}) on a method
-        if (is_array($values)) {
-            foreach ($values as $key => $value) {
-                if (!is_string($value)) {
-                    throw new \RuntimeException(sprintf(
-                        '@Inject({"param" = "value"}) expects "value" to be a string, %s given.',
-                        json_encode($value)
-                    ));
-                }
-                $this->parameters[$key] = $value;
-            }
-        }
     }
 
     public function isInjectObject()
@@ -57,11 +45,6 @@ final class Inject
     public function getName()
     {
         return $this->name;
-    }
-
-    public function getParameters()
-    {
-        return $this->parameters;
     }
 
     public function setVar($var)
