@@ -4,10 +4,18 @@
 A7 is a simple php library, that implements AOP principles with annotations (doc block comments),
 that support post processors and natively supported
 
- - dependency injection with scope (singleton and prototype) and lazy loading (default enabled)
- - call init method
- - transactional
- - logging
+ - [Getting object into container](#getting-object-into-container)
+    - [get by class name](#get-by-class-name)
+    - [get by interface name](#get-by-interface-name)
+    - [scopes](#scopes)
+    - [lazy loading](#lazy-loading)
+    - call init method
+ - [Dependency Injection](#dependency-injection)
+    - [How to enable](#how-to-enable)
+    - [Inject static values](#inject-static-values)
+    - [Inject object](#inject-object)
+ - Transactional
+ - Logging
 
 and supported custom post processors
 
@@ -58,7 +66,7 @@ $someClassObjetc = $container->get("Some\\SomeClass");
 
 ```
 
-##### scoping 
+##### scopes 
 Default all class that getting form a7 container is a singleton.
 Exist two scoping type *singleton* and *prototype*
  - _singleton_ : When from all php life cycle exist only one instance from that class.
@@ -78,9 +86,29 @@ class IsPrototypeClass {
 }
 
 ```
-##### lazy loading
-If lazy loading has turn on for class then class initializing when //TODO 
 
+##### lazy loading
+If lazy loading has turn on for class then class initializing when anybody took this class
+call method or get or set any property.
+Lazy loading default is turn on for all classes in container. 
+You can turn off
+
+```php
+
+/**
+ * @Injectable(lazy=false)
+ */
+class NoteLazyLoadingClass {
+}
+
+// you can not write, this is a default values
+/**
+ * @Injectable(lazy=true, scope="singleton")
+ */
+class SomeClass {
+}
+
+```
 ### Dependency Injection
 
 ##### How to enable
