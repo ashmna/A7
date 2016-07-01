@@ -54,7 +54,7 @@ namespace Some {
 }
 
 namespace Some\Impl {
-    class SomeNameImpl implements Some\SomeClass {
+    class SomeClassImpl implements Some\SomeClass {
         public function methode() {
         }
     }
